@@ -1,62 +1,42 @@
-const jwt = require('jsonwebtoken');
-const jwt2 = require('jwt-simple');
-const moment = require('moment');
-const config = require('../config');
+require("dotenv").config()
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
+const userRoutes = require("./routes/user");
 
-function verifyToken(req, res, next){
-    const bearerHeader= req.headers['authorization'];
+const app = express();
 
-    if(typeof bearerHeader !== 'undefined'){
-        const bearerToken = bearerHeader.split(' ')[1];
-        req.token= bearerToken;
-
-        jwt.verify(req.token, 'secretkey', (err, authData) => {
-            if(err)  res.sendStatus(403);
-        });
-
-        next();
-
-    }else {    res.sendStatus(403); }
-}
-
-function createToken(user){
-    const  payload = {
-
-        sub: user._identificacion,
-        iat: moment().unix(),
-        exp: moment().add(14,'days').unix(),
-    }
-
-    return jwt2.encode(payload, config.SECRET_TOKEN)
-
-}
-
-function decodeToken (token) {
-    const decoded = new Promise((resolve, reject) => {
-        try{
-            const payload = jwt2.decode(token, config.SECRET_TOKEN)
-
-            if (payload.exp <= moment().unix()) {
-                reject({
-                    status: 401,
-                    message: 'El token ha expirado'
-                })
-            }
-            resolve(payload.sub)
-        }catch (err) {
-            reject ({
-                status: 500,
-                message:'Token invalido'
-
-            })
-        }
+mongoose
+    .connect(
+        "mongodb+srv://mplay-private:" +
+        process.env.MONGO_ATLAS_PW +
+        "@mplay-private-1yqgt.mongodb.net/test?retryWrites=true&w=majority",
+        { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }
+    )
+    .then(() => {
+        console.log("Connected to database!");
     })
+    .catch(err => {
+        console.log("Connection failed!");
+    });
 
-    return decoded
-}
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-module.exports = {
-    createToken,
-    decodeToken
-}
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+    );
+    next();
+});
+
+app.use("/api/user", userRoutes);
+
+module.exports = app;
