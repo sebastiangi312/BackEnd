@@ -9,9 +9,9 @@ const app = express();
 
 mongoose
     .connect(
-        "mongodb+srv://mplay-private:" +
+        "mongodb+srv://mplay:" +
         process.env.MONGO_ATLAS_PW +
-        "@mplay-private-1yqgt.mongodb.net/test?retryWrites=true&w=majority",
+        "@mplay-d7oek.mongodb.net/test?retryWrites=true&w=majority",
         { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }
     )
     .then(() => {
