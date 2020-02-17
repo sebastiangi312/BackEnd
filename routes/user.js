@@ -8,8 +8,11 @@ router.post("/signup", UserController.createUser);
 
 router.post("/login", UserController.userLogin);
 
+router.put("/userAuth", checkAuth, UserController.authorizeUser);
+
 router.get("/:userId", checkAuth, UserController.getCurrentUser);
 
 router.put("/:userId", checkAuth, UserController.editUser);
+
 
 module.exports = router;
