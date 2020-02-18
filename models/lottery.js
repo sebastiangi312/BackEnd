@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
     secondPrize: { type: Number, required: true },
     thirdPrize: { type: Number, required: true },
     creationDate: { type: Date, required: true },
-    Open: { type: Boolean, required: true}
+    open: { type: Boolean, required: true}
 });
 
 userSchema.plugin(uniqueValidator);
