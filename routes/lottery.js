@@ -6,4 +6,6 @@ const LotteryController = require("../controllers/lottery");
 
 const router = express.Router();
 
-router.get("", BetsController.getLotteries);
+router.get("", LotteryController.getLotteries);
+
+module.exports = router;
