@@ -61,12 +61,11 @@ exports.getSelectedLottery = async (req, res) => {
     }
 };
 
-exports.editSelectedLottery = async (req, res) => {
+exports.editLottery = async (req, res) => {
     try {
-        const { open, closingDate, fare } = req.body;
-        const lottery = await Lottery.findById(req.params.lotteryId);
-        const result = await Lottery.updateOne({ open: req.params.open }, { closingDate: req.params.closingDate },
-            { fare: req.params.fare })
+        const { fare, closingDate, firstPrize, secondPrize, thirdPrize } = req.body;
+        const result = await Lottery.updateOne({ _id: req.params.id },
+            { fare: fare, closingDate: closingDate, firstPrize: firstPrize, secondPrize: secondPrize, thirdPrize: thirdPrize });
         if (result.n > 0) {
             res.status(200).json({ message: "Update successful!" });
         } else {
@@ -74,7 +73,24 @@ exports.editSelectedLottery = async (req, res) => {
         }
     } catch (err) {
         res.status(500).json({
-            message: "Couldn't udpate post!"
+            message: "Couldn't udpate lottery"
         });
     }
 };
+
+exports.deleteLottery = async (req, res) => {
+    try {
+        const result = await Lottery.deleteOne({ _id: req.params.id })
+        if (result.n > 0) {
+            res.status(200).json({ message: 'Se borró satisfactoriamente' });
+        } else {
+            res.status(500).json({
+                message: "Deleting lottery failed!"
+            });
+        }
+    } catch {
+        res.status(500).json({
+            message: "Deleting lottery failed!"
+        });
+    }
+}

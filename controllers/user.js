@@ -26,7 +26,7 @@ exports.userLogin = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 message: "Credenciales de autenticación inválidas",
-                });
+            });
         }
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (!validPassword) {
@@ -107,13 +107,13 @@ exports.editUser = async (req, res) => {
     }
 }
 
-exports.authorizeUser = async(req, res) => {
+exports.authorizeUser = async (req, res) => {
     try {
         //Usuario que se va a autorizar
-        const {idUserToAuthorize} = req.body;
+        const { idUserToAuthorize } = req.body;
 
-        const result = await User.updateOne({ _id: idUserToAuthorize }, {$set: {'roles.bettor': true}});
-        
+        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': true } });
+
         if (result.n > 0) {
             res.status(200).json({ message: "Authorization successful!" });
         } else {
@@ -125,4 +125,52 @@ exports.authorizeUser = async(req, res) => {
             message: "Couldn't authorize user!"
         });
     }
+}
+
+exports.deauthorizeUser = async (req, res) => {
+    try {
+        //Usuario que se va a autorizar
+        const { idUserToAuthorize } = req.body;
+
+        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': false } });
+
+        if (result.n > 0) {
+            res.status(200).json({ message: "Authorization successful!" });
+        } else {
+            res.status(401).json({ message: "Not authorized! ok", message: result });
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            message: "Couldn't authorize user!"
+        });
+    }
+}
+
+
+exports.getNonSubUsers = async (req, res) => {
+    const pageSize = +req.query.pagesize;
+    const currentPage = +req.query.page;
+    const userQuery = User.find({ roles: { subscriber: true } });
+    let fetchedUsers;
+    if (pageSize && currentPage) {
+        userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+    }
+    userQuery
+        .then(documents => {
+            fetchedUsers = documents;
+            return User.count();
+        })
+        .then(count => {
+            res.status(200).json({
+                message: "Users fetched successfully!",
+                users: fetchedUsers,
+                maxUsers: count
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "Fetching users failed!"
+            });
+        });
 }
