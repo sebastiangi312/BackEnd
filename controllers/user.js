@@ -67,7 +67,8 @@ exports.getCurrentUser = async (req, res) => {
         const birthdate = user.birthdate;
         const phone = user.phone;
         const balance = user.balance;
-        const profileData = { id, name, email, birthdate, phone, balance }
+        const roles = user.roles;
+        const profileData = { id, name, email, birthdate, phone, balance, roles }
         res.status(200).json(profileData);
     } catch (err) {
         return res.status(401).json({
