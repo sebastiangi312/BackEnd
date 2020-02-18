@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
     firstPrize: { type: Number, required: true },
     secondPrize: { type: Number, required: true },
     thirdPrize: { type: Number, required: true },
-    creationDate: { type: Boolean, required: true },
+    creationDate: { type: Date, required: true },
     Open: { type: Boolean, required: true}
 });
 
