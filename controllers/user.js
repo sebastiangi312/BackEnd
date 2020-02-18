@@ -25,8 +25,8 @@ exports.userLogin = async (req, res) => {
         const user = await User.findOne({ email: req.body.email })
         if (!user) {
             return res.status(401).json({
-                message: "Credenciales de autenticación inválidas"
-            });
+                message: "Credenciales de autenticación inválidas",
+                });
         }
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (!validPassword) {
@@ -108,26 +108,20 @@ exports.editUser = async (req, res) => {
 
 exports.authorizeUser = async(req, res) => {
     try {
-        //reqUser es el usuario que está solicitando autorizar, se verifica que sea admin.
-        const reqUser = await User.findById(req.userData.userId);
+        //Usuario que se va a autorizar
+        const {idUserToAuthorize} = req.body;
 
-        if(reqUser.roles.admin){
-            //Usuario que se va a autorizar
-            const {idUserToAuthorize} = req.body;
+        const result = await User.updateOne({ _id: idUserToAuthorize }, {$set: {'roles.bettor': true}});
+        
+        if (result.n > 0) {
+            res.status(200).json({ message: "Authorization successful!" });
+        } else {
+            res.status(401).json({ message: "Not authorized! ok", message: result });
+        }
 
-            const result = await User.updateOne({ _id: idUserToAuthorize }, {$set: {'roles.bettor': true}})
-                if (result.n > 0) {
-                    res.status(200).json({ message: "Authorization successful!" });
-                } else {
-                    res.status(401).json({ message: "Not authorized!" });
-                }
-
-        }else{
-            res.status(401).json({ message: "Not authorized!" });
-        }        
     } catch (err) {
         res.status(500).json({
-            message: "Couldn't udpate post!"
+            message: "Couldn't authorize user!"
         });
     }
 }
