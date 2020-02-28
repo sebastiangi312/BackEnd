@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const userSchema = mongoose.Schema({
+const lotterySchema = mongoose.Schema({
     fare: { type: Number, required: true },
     closingDate: { type: Date, required: true },
     firstPrize: { type: Number, required: true },
@@ -11,6 +11,6 @@ const userSchema = mongoose.Schema({
     open: { type: Boolean, required: true}
 });
 
-userSchema.plugin(uniqueValidator);
+lotterySchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model("Lottery", userSchema, "lottery");
+module.exports = mongoose.model("Lottery", lotterySchema, "lotteries");
