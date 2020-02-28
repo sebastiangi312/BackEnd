@@ -23,13 +23,13 @@ exports.getLotteries = async (req, res) => {
         res.status(200).json({
             message: "Loterías encontradas satisfactoriamente",
             result: lotteries
-        })
+        });
     } catch {
         res.status(500).json({
             message: "Fallo encontrando las loterías"
-        })
+        });
     }
-}
+};
 
 // escoger una loteria de una lista de loterias existentes (que no se hacer)
 exports.selectLottery = async (req, res) => {
@@ -52,7 +52,7 @@ exports.getSelectedLottery = async (req, res) => {
         const lotteryData = {
             id, ticket, fare, closingDate, creationDate, firstPrize, secondPrize,
             thirdPrize, open
-        }
+        };
         res.status(200).json(lotteryData);
     } catch (err) {
         return res.status(401).json({
@@ -80,7 +80,7 @@ exports.editLottery = async (req, res) => {
 
 exports.deleteLottery = async (req, res) => {
     try {
-        const result = await Lottery.deleteOne({ _id: req.params.id })
+        const result = await Lottery.deleteOne({ _id: req.params.id });
         if (result.n > 0) {
             res.status(200).json({ message: 'Se borró satisfactoriamente' });
         } else {
@@ -93,4 +93,4 @@ exports.deleteLottery = async (req, res) => {
             message: "Deleting lottery failed!"
         });
     }
-}
+};
