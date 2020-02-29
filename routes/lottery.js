@@ -1,5 +1,4 @@
 const express = require("express");
-const UserController = require("../controllers/user");
 const checkAuth = require('../middleware/check-auth');
 const checkAuthAdmin = require('../middleware/check-auth-admin');
 
