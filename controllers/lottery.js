@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
+const Ticket = require("../models/ticket")
 
 exports.createLottery = async (req, res) => {
     try {
@@ -75,17 +76,19 @@ exports.editLottery = async (req, res) => {
 
 exports.deleteLottery = async (req, res) => {
     try {
-        const result = await Lottery.deleteOne({ _id: req.params.id });
-        if (result.n > 0) {
-            res.status(200).json({ message: 'Se borró satisfactoriamente' });
-        } else {
-            res.status(500).json({
-                message: "Deleting lottery failed!"
-            });
+        const anyTicket = await Ticket.findOne({ lotteryId: req.params.id });
+
+        if(!anyTicket){
+            const result = await Lottery.deleteOne({ _id: req.params.id });
+            if (result.n > 0) {
+                res.status(200).json({ message: "Deleting lottery was successful!" });
+            } else {
+                res.status(500).json({ message: "Deleting lottery failed!" });
+            }
+        } else{
+            res.status(500).json({ message: "Deleting lottery failed!" });
         }
     } catch {
-        res.status(500).json({
-            message: "Deleting lottery failed!"
-        });
+        res.status(500).json({ message: "Deleting lottery failed!" });
     }
 };
