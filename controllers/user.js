@@ -117,7 +117,7 @@ exports.authorizeUser = async (req, res) => {
         if (result.n > 0) {
             res.status(200).json({ message: "Authorization successful!" });
         } else {
-            res.status(401).json({ message: "Not authorized! ok", message: result });
+            res.status(401).json({ message1: "Not authorized! ok", message2: result }); // peta test
         }
 
     } catch (err) {
@@ -137,7 +137,7 @@ exports.deauthorizeUser = async (req, res) => {
         if (result.n > 0) {
             res.status(200).json({ message: "Authorization successful!" });
         } else {
-            res.status(401).json({ message: "Not authorized! ok", message: result });
+            res.status(401).json({ message1: "Not authorized! ok", message2: result }); // peta test
         }
 
     } catch (err) {

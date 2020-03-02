@@ -21,5 +21,4 @@ router.get("", checkAuth, checkAuthAdmin, UserController.getNonSubUsers);
 
 router.get("/authUsers/list", checkAuth, checkAuthAdmin, UserController.getAuthorizedUsers);
 
-
 module.exports = router;

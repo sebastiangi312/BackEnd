@@ -4,7 +4,6 @@ const User = require("../models/user");
 module.exports = async(req, res, next) => {
     try {
         const reqUser = await User.findById(req.userData.userId);
-
         if(reqUser.roles.admin){
             next();
         }        
