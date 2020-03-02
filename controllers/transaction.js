@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
-const Transaction = require("../models/transactions");
-const User = require("../models/user")
 
 
 exports.createTransaction = async (req, res) => {
@@ -99,7 +97,6 @@ exports.chargeMoney = async (req, res) => {
         //Usuario al que se la hara la recarga
         const { transactionData } = req.body;
         const { idUserToCharge } = req.params.userId;
-        const transactionData = { user, admin, amount, approved };
         const result = await User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
         
         if (result.n > 0) {
