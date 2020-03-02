@@ -7,9 +7,9 @@ const TransactionController = require("../controllers/transaction");
 
 const router = express.Router();
 
-router.get("", checkAuth, TransactionController.getNonApprovedTransactions);
-router.get("", checkAuth, TransactionController.getTransactions);
+router.get("", checkAuth, checkAuthAdmin, TransactionController.getNonApprovedTransactions);
+router.get("", checkAuth, checkAuthAdmin, TransactionController.getTransactions);
 router.put("/edit/:id", checkAuth, checkAuthAdmin, TransactionController.approveTransaction);
-router.post("", checkAuth, checkAuthAdmin, TransactionController.createTransaction);
+router.post("", checkAuth, TransactionController.createTransaction);
 
 module.exports = router;
