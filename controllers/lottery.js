@@ -31,11 +31,6 @@ exports.getLotteries = async (req, res) => {
     }
 };
 
-// escoger una loteria de una lista de loterias existentes (que no se hacer)
-exports.selectLottery = async (req, res) => {
-
-};
-
 exports.getSelectedLottery = async (req, res) => {
     try {
         const lottery = await Lottery.findById(req.params.lotteryId);

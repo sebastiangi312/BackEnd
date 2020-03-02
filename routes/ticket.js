@@ -4,6 +4,6 @@ const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
-router.post("/lotteryTicket", checkAuth, TicketController.createLotteryTicket );
+router.post("", checkAuth, TicketController.createLotteryTicket );
 
 module.exports = router;
