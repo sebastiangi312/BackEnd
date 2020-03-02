@@ -157,15 +157,21 @@ exports.getNonSubUsers = async (req, res) => {
         userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
     }
     userQuery
-    .then(documents => {
-        fetchedUsers = documents;
-        return User.count();
-    })
-    .then(count => {
-        res.status(200).json({
-            message: "Users fetched successfully!",
-            users: fetchedUsers,
-            maxUsers: count
+        .then(documents => {
+            fetchedUsers = documents;
+            return fetchedUsers.length;
+        })
+        .then(count => {
+            res.status(200).json({
+                message: "Users fetched successfully!",
+                users: fetchedUsers,
+                maxUsers: count
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "Fetching users failed!"
+            });
         });
     })
     .catch(error => {
