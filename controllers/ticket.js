@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken")
-const Ticket = require("../models/ticket")
-const User = require("../models/user")
-const Lottery= require("../models/lottery")
+const jwt = require("jsonwebtoken");
+const Ticket = require("../models/ticket");
+const User = require("../models/user");
+const Lottery= require("../models/lottery");
 
 exports.createLotteryTicket = async (req, res) => {
     try {

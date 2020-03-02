@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const ticketSchema = mongoose.Schema({
-    user: { type: User, required: true },
-    bet: { type: Lottery, required: true},
+    userID: { type: String, required: true },
+    bet: { type: String, required: true},
     firstNumber: { type: Number, required: true },
     secondNumber: { type: Number, required: true },
     thirdNumber: { type: Number, required: true },
