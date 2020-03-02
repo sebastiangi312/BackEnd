@@ -178,7 +178,7 @@ exports.getNonSubUsers = async (req, res) => {
 exports.getAuthorizedUsers = async (req, res) => {
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.page;
-    const userQuery = User.find({ authorized: true });
+    const userQuery = User.find({ roles: { subscriber: true, bettor: true } });
     let fetchedUsers;
     if (pageSize && currentPage) {
         userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
