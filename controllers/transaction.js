@@ -103,7 +103,7 @@ exports.chargeMoney = async (req, res) => {
         const { transactionData } = req.body;
         const { idUserToCharge } = req.params.userId;
         const transactionData = { user, admin, amount, approved };
-        const result = User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
+        const result = await User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
         
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga realizada correctamente"});
@@ -123,7 +123,6 @@ exports.deleteCharge = async (req, res) => {
         const collection = mplay.collection('transactions')
         const { transactionData } = req.body;
         const result = collection.remove({ _id: transactionData._id})
-        const result = Transaction.remove(req.params.transactionId);
 
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga eliminada correctamente"});

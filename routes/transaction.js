@@ -12,6 +12,6 @@ router.put("/edit/:id", checkAuth, checkAuthAdmin, TransactionController.approve
 router.post("", checkAuth, checkAuthAdmin, TransactionController.createTransaction);
 
 router.put("/chargeAuth", checkAuth, checkAuthAdmin, TransactionController.chargeMoney);
-router.get("/chargeDeauth", checkAuth, checkAuthAdmin, TransactionController.deleteCharge)
+router.get("/chargeDeauth", checkAuth, checkAuthAdmin, TransactionController.deleteCharge);
 
 module.exports = router;
