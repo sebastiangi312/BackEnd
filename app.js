@@ -7,6 +7,7 @@ const userRoutes = require("./routes/user");
 const lotteryRoutes = require("./routes/lottery");
 const adminRoutes = require("./routes/admin");
 const transactionRoutes = require("./routes/transaction");
+const ticketRoutes = require("./routes/ticket");
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 app.use("/api/user", userRoutes);
 app.use("/api/lottery", lotteryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/ticket", ticketRoutes);
 app.use("/api/lottery", adminRoutes);
 app.use("/api/transaction", transactionRoutes);
 
