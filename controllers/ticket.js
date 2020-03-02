@@ -11,7 +11,7 @@ exports.createLotteryTicket = async (req, res) => {
         });
     } catch (err) {
         return res.status(500).json({
-            message: "Internal server error"
+            message: err
         });
     }
 };
