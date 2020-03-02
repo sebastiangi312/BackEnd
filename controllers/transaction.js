@@ -1,12 +1,9 @@
 const jwt = require("jsonwebtoken");
-<<<<<<< HEAD
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
-=======
 const Transaction = require("../models/transactions");
 const User = require("../models/user")
-const mongoose = require("mongoose")
->>>>>>> Recarga de dinero
+
 
 exports.createTransaction = async (req, res) => {
     try {
