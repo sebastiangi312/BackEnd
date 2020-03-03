@@ -42,22 +42,22 @@ exports.getNonApprovedTransactions = async (req, res) => {
         transactionQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
     }
     transactionQuery
-    .then(documents => {
-        fetchedTransactions = documents;
-        return Transaction.countDocuments();
-    })
-    .then(count => {
-        res.status(200).json({
-            message: "Transactions fetched successfully!",
-            transaction: fetchedTransactions,
-            maxTransactions: count
+        .then(documents => {
+            fetchedTransactions = documents;
+            return Transaction.countDocuments();
+        })
+        .then(count => {
+            res.status(200).json({
+                message: "Transactions fetched successfully!",
+                transaction: fetchedTransactions,
+                maxTransactions: count
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "Fetching transactions failed!"
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            message: "Fetching transactions failed!"
-        });
-    });
 };
 
 exports.getSelectedTransaction = async (req, res) => {
@@ -77,7 +77,7 @@ exports.getSelectedTransaction = async (req, res) => {
 };
 
 exports.approveTransaction = async (req, res) => {
-    try { 
+    try {
         const { adminID, approved } = req.body;
         const result = await Transaction.updateOne({ _id: req.params.id }, { adminID: adminID, approved: approved });
         if (result.n > 0) {
@@ -93,19 +93,23 @@ exports.approveTransaction = async (req, res) => {
 };
 
 exports.chargeMoney = async (req, res) => {
-    try{
+    try {
         //Usuario al que se la hara la recarga
-        const { idUser, amount } = req.body;
-        const user = await User.findOne({ _id: idUser });
+        const chargeId = req.body.idChargeToAuthorize;
+        const charge = await Transaction.findOne({ _id: chargeId });
+        const userId = charge.userID
+        const amount = charge.amount;
+        const user = await User.findOne({ _id: userId });
         const newBalance = amount + user.balance;
-        const result = await User.updateOne({ _id: idUser }, { 'balance': newBalance });
-        
+        const result = await User.updateOne({ _id: userId }, { balance: newBalance });
+        const transactionUpdate = await Transaction.updateOne({ _id: chargeId }, { approved: true });
+        // Se demora mucho porque hay muchos awaits.
         if (result.n > 0) {
-            res.status(200).json({ message: "Recarga realizada correctamente"});
-        } else{
-            res.status(401).json({ message: "Error al realizar la recarga"});
+            res.status(200).json({ message: "Recarga realizada correctamente" });
+        } else {
+            res.status(401).json({ message: "Error al realizar la recarga" });
         }
-        
+
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
@@ -114,15 +118,15 @@ exports.chargeMoney = async (req, res) => {
 };
 
 exports.deleteCharge = async (req, res) => {
-    try{
-        const  { transactionData } = req.body;
-        const result = await Transaction.remove({ _id: transactionData })
+    try {
+        const chargeId = req.params.id;
+        const result = await Transaction.remove({ _id: chargeId })
         if (result.n > 0) {
-            res.status(200).json({ message: "Recarga eliminada correctamente"});
-        } else{
-            res.status(401).json({ message: "Error al eliminar la recarga"});
+            res.status(200).json({ message: "Recarga eliminada correctamente" });
+        } else {
+            res.status(401).json({ message: "Error al eliminar la recarga" });
         }
-        
+
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
@@ -131,12 +135,11 @@ exports.deleteCharge = async (req, res) => {
 };
 
 exports.getTransactionUser = async (req, res) => {
-    try{
-        
+    try {
+
         const transactionId = req.params.id;
         const result = await Transaction.findOne({ _id: transactionId })
         const user = await User.findOne({ _id: result.userID });
-        console.log(user.name)
         if (!user) {
             return res.status(401).json({
                 message: "Credenciales de autenticación inválidas"
@@ -144,10 +147,9 @@ exports.getTransactionUser = async (req, res) => {
         }
         const name = user.name;
         const profileData = { name };
-        console.log(name)
         res.status(200).json(profileData);
-        
-    }catch(err) {
+
+    } catch (err) {
         return res.status(401).json({
             message: "Credenciales de autenticacion invalidas"
         })

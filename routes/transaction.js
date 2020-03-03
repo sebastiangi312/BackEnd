@@ -12,7 +12,7 @@ router.put("/edit/:id", checkAuth, checkAuthAdmin, TransactionController.approve
 router.post("", checkAuth, TransactionController.createTransaction);
 
 router.put("/chargeAuth", checkAuth, checkAuthAdmin, TransactionController.chargeMoney);
-router.get("/chargeDeauth", checkAuth, checkAuthAdmin, TransactionController.deleteCharge);
+router.delete("/chargeDeauth/:id", checkAuth, checkAuthAdmin, TransactionController.deleteCharge);
 router.get("/transactionName/:id", checkAuth, checkAuthAdmin, TransactionController.getTransactionUser);
 
 
