@@ -12,9 +12,9 @@ const lotterySchema = mongoose.Schema({
     winningNumberThree: { type: Number, required: false },
     winningNumberFour: { type: Number, required: false },
     winningNumberFive: { type: Number, required: false },
-    firstPrizeWinners: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
-    secondPrizeWinners: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
-    thirdPrizeWinners: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+    firstPrizeWinners: {type: mongoose.Schema.Types.userId, ref: "User", required: false },
+    secondPrizeWinners: {type: mongoose.Schema.Types.userId, ref: "User", required: false },
+    thirdPrizeWinners: {type: mongoose.Schema.Types.userId, ref: "User", required: false },
     creationDate: { type: Date, required: true },
     open: { type: Boolean, required: true}
 });
