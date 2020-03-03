@@ -5,8 +5,8 @@ const User = require("../models/user");
 
 exports.createTransaction = async (req, res) => {
     try {
-        const { amount, _idUser } = req.body;
-        const transaction = new Transaction({ userID: _idUser, amount: amount, approved: false });
+        const { amount, _idUser, userName } = req.body;
+        const transaction = new Transaction({ userID: _idUser, userName: userName, amount: amount, approved: false });
         const result = await transaction.save();
         res.status(201).json({
             message: "Transaccion solicitada satisfactoriamente",
