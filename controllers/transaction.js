@@ -142,7 +142,6 @@ exports.getTransactionUser = async (req, res) => {
                 message: "Credenciales de autenticación inválidas"
             });
         }
-
         const name = user.name;
         const profileData = { name };
         console.log(name)
