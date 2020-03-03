@@ -115,10 +115,8 @@ exports.chargeMoney = async (req, res) => {
 
 exports.deleteCharge = async (req, res) => {
     try{
-        const collection = mplay.collection('transactions')
-        const { transactionData } = req.body;
-        const result = collection.remove({ _id: transactionData._id})
-
+        const  { transactionData } = req.body;
+        const result = await Transaction.remove({ _id: transactionData })
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga eliminada correctamente"});
         } else{
