@@ -49,7 +49,7 @@ exports.closeLottery = async (req, res) => {
                 ip1 = ip1 + 1;
              });
              var ip2 = 0;
-               seconPrizeWinners.forEach( async function(secondPrize){
+               secondPrizeWinners.forEach( async function(secondPrize){
                 const user = await User.findById(secondPrizeWinners[ip2]);
                 var newBalance = user.balance + (secondPrize/secondPrizeWinners.length); 
                 const results = await User.updateOne({ _id: secondPrizeWinners[ip2]}, { "balance": newBalance});
@@ -79,7 +79,7 @@ exports.closeLottery = async (req, res) => {
     } catch {
         res.status(500).json({
             message: "closing lottery failed!"
-        });0
+        });
     }
 };
 
