@@ -44,7 +44,7 @@ exports.getNonApprovedTransactions = async (req, res) => {
     userQuery
     .then(documents => {
         fetchedTransactions = documents;
-        return Transaction.count();
+        return Transaction.countDocuments();
     })
     .then(count => {
         res.status(200).json({
