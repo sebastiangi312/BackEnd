@@ -36,12 +36,12 @@ exports.getTransactions = async (req, res) => {
 exports.getNonApprovedTransactions = async (req, res) => {
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.page;
-    const TransactionQuery = Transaction.find({ approved: false });
+    const transactionQuery = Transaction.find({ approved: false });
     let fetchedTransactions;
     if (pageSize && currentPage) {
-        userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+        transactionQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
     }
-    userQuery
+    transactionQuery
     .then(documents => {
         fetchedTransactions = documents;
         return Transaction.countDocuments();
@@ -95,8 +95,8 @@ exports.approveTransaction = async (req, res) => {
 exports.chargeMoney = async (req, res) => {
     try{
         //Usuario al que se la hara la recarga
-        const { transactionData } = req.body;
-        const { idUserToCharge } = req.params.userId;
+        const transactionData = req.body;
+        const idUserToCharge = req.params.userId;
         const result = await User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
         
         if (result.n > 0) {
@@ -133,9 +133,11 @@ exports.deleteCharge = async (req, res) => {
 
 exports.getTransactionUser = async (req, res) => {
     try{
-        const  { transactionData } = req.body;
-        const result = await Transaction.findOne({ _id: transactionData })
+        
+        const transactionId = req.params.id;
+        const result = await Transaction.findOne({ _id: transactionId })
         const user = await User.findOne({ _id: result.userID });
+        console.log(user.name)
         if (!user) {
             return res.status(401).json({
                 message: "Credenciales de autenticación inválidas"
@@ -144,7 +146,9 @@ exports.getTransactionUser = async (req, res) => {
 
         const name = user.name;
         const profileData = { name };
+        console.log(name)
         res.status(200).json(profileData);
+        
     }catch(err) {
         return res.status(401).json({
             message: "Credenciales de autenticacion invalidas"
