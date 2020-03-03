@@ -95,9 +95,10 @@ exports.approveTransaction = async (req, res) => {
 exports.chargeMoney = async (req, res) => {
     try{
         //Usuario al que se la hara la recarga
-        const { transactionData } = req.body;
-        const { idUserToCharge } = req.params.userId;
-        const result = await User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
+        const { idUser, amount } = req.body;
+        const user = await User.findOne({ _id: idUser });
+        const newBalance = amount + user.balance;
+        const result = await User.updateOne({ _id: idUser }, { 'balance': newBalance });
         
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga realizada correctamente"});
