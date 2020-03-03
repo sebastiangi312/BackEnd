@@ -9,6 +9,7 @@ const router = express.Router();
 router.get("", checkAuth, LotteryController.getLotteries);
 router.delete("/delete/:id", checkAuth, checkAuthAdmin, LotteryController.deleteLottery);
 router.put("/edit/:id", checkAuth, checkAuthAdmin, LotteryController.editLottery);
+router.put("/close/:id", checkAuth, checkAuthAdmin, LotteryController.closeLottery);
 router.post("", checkAuth, checkAuthAdmin, LotteryController.createLottery);
 
 module.exports = router;
