@@ -12,3 +12,4 @@ router.put("/edit/:id", checkAuth, checkAuthAdmin, LotteryController.editLottery
 router.post("", checkAuth, checkAuthAdmin, LotteryController.createLottery);
 
 module.exports = router;
+
