@@ -110,7 +110,7 @@ exports.chargeMoney = async (req, res) => {
             message: "Usuario no autorizado"
         })
     }
-}
+};
 
 exports.deleteCharge = async (req, res) => {
     try{
@@ -129,4 +129,25 @@ exports.deleteCharge = async (req, res) => {
             message: "Usuario no autorizado"
         })
     }
-}
+};
+
+exports.getTransactionUser = async (req, res) => {
+    try{
+        const  { transactionData } = req.body;
+        const result = await Transaction.findOne({ _id: transactionData })
+        const user = await User.findOne({ _id: result.userID });
+        if (!user) {
+            return res.status(401).json({
+                message: "Credenciales de autenticación inválidas"
+            });
+        }
+
+        const name = user.name;
+        const profileData = { name };
+        res.status(200).json(profileData);
+    }catch(err) {
+        return res.status(401).json({
+            message: "Credenciales de autenticacion invalidas"
+        })
+    }
+};

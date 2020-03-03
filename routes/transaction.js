@@ -13,5 +13,7 @@ router.post("", checkAuth, TransactionController.createTransaction);
 
 router.put("/chargeAuth", checkAuth, checkAuthAdmin, TransactionController.chargeMoney);
 router.get("/chargeDeauth", checkAuth, checkAuthAdmin, TransactionController.deleteCharge);
+router.get("/transactionName", checkAuth, checkAuthAdmin, TransactionController.getTransactionUser);
+
 
 module.exports = router;
