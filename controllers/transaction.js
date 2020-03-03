@@ -115,8 +115,8 @@ exports.chargeMoney = async (req, res) => {
 
 exports.deleteCharge = async (req, res) => {
     try{
-        const transactionData = req.body;
-        const result = transaction.remove({ _id: transactionData})
+        const  { transactionData } = req.body;
+        const result = await Transaction.remove({ _id: transactionData })
 
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga eliminada correctamente"});
