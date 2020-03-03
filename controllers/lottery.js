@@ -32,6 +32,77 @@ exports.getLotteries = async (req, res) => {
     }
 };
 
+exports.closeLottery = async (req, res) => {
+    try {
+        const lottery = await Lottery.findById(req.params.id);
+        const winningNumberOne = lottery.winningNumberOne; 
+        const winningNumberTwo = lottery.winningNumberTwo; 
+        const winningNumberThree = lottery.winningNumberThree; 
+        const winningNumberFour = lottery.winningNumberFour; 
+        const winningNumberFive = lottery.winningNumberFive;
+        const lottid = lottery.id;
+        if  (lottery.closingDate >= Date.now()) {
+            const ticket = await Ticket.find({ "lotteryId": req.params.id }).toArray(function (result) {
+               if ((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour)&&(result.fifthNumber=== winningNumberFive)){
+                   firstPrizeWinners.push(result.userId);
+               } else 
+               if (((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.firstNumber=== winningNumberOne)&&(result.ThirdNumber=== winningNumberThree)&&(result.fifthNumber=== winningNumberFive)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.fourthNumber=== winningNumberFour)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.fifthNumber=== winningNumberFive)&&(result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour))){
+                   secondPrizeWinners.push(result.userId);
+               }else 
+               if (((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree))
+               ||((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.firstNumber=== winningNumberOne)&&(result.secondNumber=== winningNumberTwo)&&(result.fifthNumber=== winningNumberFive))
+               ||((result.firstNumber=== winningNumberOne)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.firstNumber=== winningNumberOne)&&(result.thirdNumber=== winningNumberThree)&&(result.fifthNumber=== winningNumberFive))
+               ||((result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberFour))
+               ||((result.secondNumber=== winningNumberTwo)&&(result.thirdNumber=== winningNumberThree)&&(result.fifthNumber=== winningNumberFive))
+               ||((result.thirdNumber=== winningNumberThree)&&(result.fourthNumber=== winningNumberfour)&&(result.fifthNumber=== winningNumberFive))){
+                   thirdPrizeWinners.push(result.userId);    
+               }
+               var ip1 = 0;
+               firstPrizeWinners.forEach( async function(firstPrize){
+                const user = await User.findById(firstPrizeWinners[ip1]);
+                user.balance = user.balance + (firstPrize/firstPrizeWinners.length); 
+                ip1 = ip1 + 1;
+             });
+             var ip2 = 0;
+               secondPrizeWinners.forEach( async function(secondPrize){
+                const user = await User.findById(secondPrizeWinners[ip2]);
+                user.balance = user.balance + (secondPrize/secondPrizeWinners.length); 
+                ip2 = ip2 + 1;
+             });
+             var ip3 = 0;
+               thirdPrizeWinners.forEach( async function(fare){
+                const user = await User.findById(thirdPrizeWinners[ip3]);
+                user.balance = user.balance + fare; 
+                ip3 = ip3 + 1;
+             });
+            });
+            const result = await Lottery.updateOne({ _id: req.params.id }, { open: false});
+            if (result.n > 0) {
+                
+                res.status(200).json({ message: 'Se cerro satisfactoriamente' });
+            } else {
+                res.status(500).json({
+                    message: "closing lottery failed!"
+                });
+            }
+        } else {
+            res.status(500).json({
+                message: "closing lottery failed!"
+            });
+        }
+    } catch {
+        res.status(500).json({
+            message: "closing lottery failed!"
+        });
+    }
+};
+
 exports.getSelectedLottery = async (req, res) => {
     try {
         const lottery = await Lottery.findById(req.params.lotteryId);
