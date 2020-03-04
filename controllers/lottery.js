@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
 const Ticket = require("../models/ticket");
 const User = require("../models/user");
+const mongoose = require('mongoose');
 
 exports.createLottery = async (req, res) => {
     try {
@@ -25,9 +26,7 @@ exports.closeLottery = async (req, res) => {
         const firstPrizeWinners = [];
         const secondPrizeWinners = [];
         const thirdPrizeWinners = [];
-        const winningNumbers = [1, 1, 1, 1, 1]
-        // Array.from({ length: 5 }, () => Math.floor(Math.random() * 46));
-        console.log(winningNumbers);
+        const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 46));
         if (lottery.closingDate <= Date.now() && lottery.open) {
             const tickets = await Ticket.find({ lotteryId: req.params.id });
             tickets.forEach(ticket => {
@@ -46,9 +45,6 @@ exports.closeLottery = async (req, res) => {
                     thirdPrizeWinners.push(ticket.userId);
                 }
             });
-            console.log(firstPrizeWinners);
-            console.log(secondPrizeWinners);
-            console.log(thirdPrizeWinners);
 
             firstPrizeWinners.forEach(async (userId) => {
                 const user = await User.findById(userId);
@@ -68,7 +64,19 @@ exports.closeLottery = async (req, res) => {
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
             });
 
-            const updateLottery = await Lottery.updateOne({ _id: req.params.id }, { open: false, winningNumbers: winningNumbers });
+            const firstPrizeWinnersOId = firstPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
+            const secondPrizeWinnersOId = secondPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
+            const thirdPrizeWinnersOId = thirdPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
+
+            const updateLottery = await Lottery
+                .updateOne({ _id: req.params.id },
+                    {
+                        open: false,
+                        winningNumbers: winningNumbers,
+                        firstPrizeWinners: firstPrizeWinnersOId,
+                        secondPrizeWinners: secondPrizeWinnersOId,
+                        thirdPrizeWinners: thirdPrizeWinnersOId
+                    });
             if (updateLottery.n > 0) {
                 res.status(200).json({ message: 'Se cerro satisfactoriamente' });
             } else {
