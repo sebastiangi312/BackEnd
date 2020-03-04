@@ -28,7 +28,7 @@ exports.closeLottery = async (req, res) => {
         const winningNumbers = [1, 1, 1, 1, 1]
         // Array.from({ length: 5 }, () => Math.floor(Math.random() * 46));
         console.log(winningNumbers);
-        if (lottery.closingDate <= Date.now()) {
+        if (lottery.closingDate <= Date.now() && lottery.open) {
             const tickets = await Ticket.find({ lotteryId: req.params.id });
             tickets.forEach(ticket => {
                 var count = 0;
