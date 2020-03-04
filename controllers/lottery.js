@@ -9,6 +9,7 @@ exports.createLottery = async (req, res) => {
         const { fare, closingDate, firstPrize, secondPrize, thirdPrize } = req.body;
         const lottery = new Lottery({ fare, closingDate, firstPrize, secondPrize, thirdPrize, creationDate: new Date(), open: true });
         const result = await lottery.save();
+        setTimeout(function () { console.log("Hello"); }, 10000);
         res.status(201).json({
             message: "Lotería creada satisfactoriamente",
             result: result
@@ -22,13 +23,14 @@ exports.createLottery = async (req, res) => {
 
 exports.closeLottery = async (req, res) => {
     try {
-        const lottery = await Lottery.findById(req.params.id);
+        const lotteryId = req.body.id
+        const lottery = await Lottery.findById(lotteryId);
         const firstPrizeWinners = [];
         const secondPrizeWinners = [];
         const thirdPrizeWinners = [];
         const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 46));
         if (lottery.closingDate <= Date.now() && lottery.open) {
-            const tickets = await Ticket.find({ lotteryId: req.params.id });
+            const tickets = await Ticket.find({ lotteryId: lotteryId });
             tickets.forEach(ticket => {
                 var count = 0;
                 ticket.firstNumber === winningNumbers[0] ? count++ : count;
@@ -69,7 +71,7 @@ exports.closeLottery = async (req, res) => {
             const thirdPrizeWinnersOId = thirdPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
 
             const updateLottery = await Lottery
-                .updateOne({ _id: req.params.id },
+                .updateOne({ _id: lotteryId },
                     {
                         open: false,
                         winningNumbers: winningNumbers,
