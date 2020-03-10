@@ -111,8 +111,9 @@ exports.authorizeUser = async (req, res) => {
     try {
         //Usuario que se va a autorizar
         const { idUserToAuthorize } = req.body;
+        const { newBalance } = req.body;
 
-        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': true } });
+        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': true, 'balance': newBalance } });
 
         if (result.n > 0) {
             res.status(200).json({ message: "Authorization successful!" });
