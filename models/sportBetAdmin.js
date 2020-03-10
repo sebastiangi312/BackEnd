@@ -3,8 +3,8 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const sportBetAdminSchema = mongoose.Schema({
     finalDate: { type: Date, required: true },
-    matches: { type: [], required: true }
-    
+    matches: { type: [], required: true },
+    open: { type: Boolean, required: true }
 });
 
 sportBetAdminSchema.plugin(uniqueValidator);

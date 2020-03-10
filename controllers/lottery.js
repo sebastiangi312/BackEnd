@@ -23,7 +23,7 @@ exports.createLottery = async (req, res) => {
 
 exports.closeLottery = async (req, res) => {
     try {
-        const lotteryId = req.body.id
+        const lotteryId = req.body.id;
         const lottery = await Lottery.findById(lotteryId);
         const firstPrizeWinners = [];
         const secondPrizeWinners = [];

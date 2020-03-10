@@ -5,7 +5,7 @@ const matchSchema = mongoose.Schema({
     homeTeam: { type: String, required: true },
     awayTeam: { type: String, required: true },
     matchDate: { type: Date, required: true },
-    scoreboard: { type: String, required: true },
+    winningScore: { type: String, required: true },
     status: { type: Boolean, required: true }
 });
 
