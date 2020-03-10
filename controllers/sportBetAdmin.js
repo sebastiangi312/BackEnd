@@ -67,10 +67,6 @@ exports.setSportWinners = async (req, res) => {
                 //Tal vez haya que corregir esta actualización (spTicket._id?)
                 //const updateSpTicket = await SportTicket.updateOne({ _id: spTicket._id }, { wins: correct });
                 spWinners.push([spTicket.userId, correct, totalProfit]);
-                
-                //Falta guardar la lista de ganadores
-                //const winnersOId = spWinners.map(userId => mongoose.Types.ObjectId(userId));
-
                 adminDebt = adminDebt + totalProfit;
             }
         });
@@ -80,6 +76,7 @@ exports.setSportWinners = async (req, res) => {
         var newAdminBalance = admin.balance - adminDebt;
         const updateAdmin = await User.updateOne({ _id: spBet.adminId }, { balance: newAdminBalance });
 
+        //Se guarda la lista de ganadores
         const updateSpBet = await SportBet.updateOne({ _id: spBetID }, {winners: spWinners});
         if (updateSpBet.n > 0) {
             res.status(200).json({ message: 'Se agregaron los ganadores' });
