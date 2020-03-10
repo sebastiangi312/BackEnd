@@ -7,8 +7,8 @@ const Match = require("../models/match");
 exports.createSportBetAdmin = async (req, res) => {
     try {
         console.log(req.body);
-        const { finalDate, matches } = req.body;
-        const sportBetAdmin = new SportBet({ finalDate, matches, open: true });
+        const { adminId, finalDate, matches } = req.body;
+        const sportBetAdmin = new SportBet({ adminId, finalDate, matches, open: true, adminCost: 0, winners: [] });
         const result = await sportBetAdmin.save();
         res.status(201).json({
             message: "Apuesta deportiva creada satisfactoriamente",
@@ -25,8 +25,10 @@ exports.createSportBetAdmin = async (req, res) => {
 exports.setSportWinners = async (req, res) => {
     try {
         const spBetID = req.body.id;
+        const spBet = await SportBet.findById(spBetID);
         const spTickets = await SportTicket.find({sportBetAdminID: spBetID});
-        const winners = [];
+        const spWinners = [];
+        var adminDebt = 0;
 
         spTickets.forEach(async (spTicket) => {
             var correct = 0;
@@ -59,16 +61,33 @@ exports.setSportWinners = async (req, res) => {
                 }
                 
                 const user = await User.findById(spTicket.userId);
-                var newBalance = user.balance + money*profit;
+                var totalProfit = money*profit;
+                var newBalance = user.balance + totalProfit;
                 const updateUser = await User.updateOne({ _id: spTicket.userId }, { balance: newBalance });
                 //Tal vez haya que corregir esta actualización (spTicket._id?)
                 //const updateSpTicket = await SportTicket.updateOne({ _id: spTicket._id }, { wins: correct });
-                winners.push([spTicket.userId, correct, money*profit]);
+                spWinners.push([spTicket.userId, correct, totalProfit]);
                 
                 //Falta guardar la lista de ganadores
-                //const winnersOId = winners.map(userId => mongoose.Types.ObjectId(userId));
+                //const winnersOId = spWinners.map(userId => mongoose.Types.ObjectId(userId));
+
+                adminDebt = adminDebt + totalProfit;
             }
         });
+        
+        //Se actualiza el saldo del admin
+        const admin = await User.findById(spBet.adminId);
+        var newAdminBalance = admin.balance - adminDebt;
+        const updateAdmin = await User.updateOne({ _id: spBet.adminId }, { balance: newAdminBalance });
+
+        const updateSpBet = await SportBet.updateOne({ _id: spBetID }, {winners: spWinners});
+        if (updateSpBet.n > 0) {
+            res.status(200).json({ message: 'Se agregaron los ganadores' });
+        } else {
+            res.status(500).json({
+                message: "operation failed! 1",
+            });
+        }
     } catch (err) {
         console.log(err);
         res.status(500).json({
