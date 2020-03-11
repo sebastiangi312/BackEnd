@@ -1,9 +1,9 @@
 const express = require("express");
-const SportBetController = require("../controllers/sportBet");;
+const SportTicketController = require("../controllers/sportTicket");;
 const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
-router.post("", checkAuth, SportBetController.createSportBet );
+router.post("", checkAuth, SportTicketController.createSportTicket );
 
 module.exports = router;
