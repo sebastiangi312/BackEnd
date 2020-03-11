@@ -17,3 +17,17 @@ exports.createMatch = async (req, res) => {
         });
     }
 };
+
+exports.getMatches = async (req, res) => {
+    try {
+        const matches = await Match.find();
+        res.status(200).json({
+            message: "Matches encontrados satisfactoriamente",
+            result: matches
+        });
+    } catch {
+        res.status(500).json({
+            message: "Fallo encontrando los matches"
+        });
+    }
+};
