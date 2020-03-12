@@ -3,7 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 const User = require("./user.js");
 const Match = require("./match.js");
 
-const sportBetSchema = mongoose.Schema({    
+const sportTicketSchema = mongoose.Schema({    
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     betValue: { type: Number, required: true },
     matchBets: [{
@@ -14,6 +14,6 @@ const sportBetSchema = mongoose.Schema({
     creationDate: { type: Date, required: true }
 });
 
-sportBetSchema.plugin(uniqueValidator);
+sportTicketSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model("SportBet", sportBetSchema, "sportBets");
+module.exports = mongoose.model("SportTicket", sportTicketSchema, "sportTickets");
