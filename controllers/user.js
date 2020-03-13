@@ -34,7 +34,6 @@ exports.userLogin = async (req, res) => {
                 message: "Credenciales de autenticación inválidas"
             });
         }
-
         let payload = { email: user.email, userId: user._id };
         const token = jwt.sign(
             payload, process.env.JWT_KEY,
@@ -111,8 +110,9 @@ exports.authorizeUser = async (req, res) => {
     try {
         //Usuario que se va a autorizar
         const { idUserToAuthorize } = req.body;
+        const { newBalance } = req.body;
 
-        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': true } });
+        const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { 'roles.bettor': true, 'balance': newBalance } });
 
         if (result.n > 0) {
             res.status(200).json({ message: "Authorization successful!" });
@@ -146,7 +146,6 @@ exports.deauthorizeUser = async (req, res) => {
         });
     }
 };
-
 
 exports.getNonSubUsers = async (req, res) => {
     const pageSize = +req.query.pagesize;

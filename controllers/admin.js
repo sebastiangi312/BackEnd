@@ -1,4 +1,4 @@
-const GlobalBalance = require("../models/globalBalance")
+const GlobalBalance = require("../models/globalBalance");
 
 exports.getGlobalBalance = async (req, res) => {
     try {

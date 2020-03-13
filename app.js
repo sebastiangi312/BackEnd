@@ -1,4 +1,4 @@
-require("dotenv").config()
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -10,7 +10,7 @@ const transactionRoutes = require("./routes/transaction");
 const ticketRoutes = require("./routes/ticket");
 
 const matchRoutes = require("./routes/match");
-const sportBetAdminRoutes = require("./routes/sportBetAdmin");
+const sportTicketRoutes = require("./routes/sportTicket");
 
 const app = express();
 
@@ -49,9 +49,7 @@ app.use("/api/lottery", lotteryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ticket", ticketRoutes);
 app.use("/api/match", matchRoutes);
-app.use("/api/sportBetAdmin", sportBetAdminRoutes);
-app.use("/api/ticket", ticketRoutes);
-app.use("/api/lottery", adminRoutes);
+app.use("/api/sportTicket", sportTicketRoutes);
 app.use("/api/transaction", transactionRoutes);
 
 module.exports = app;

@@ -5,8 +5,8 @@ const User = require("../models/user");
 
 exports.createTransaction = async (req, res) => {
     try {
-        const { amount, _idUser } = req.body;
-        const transaction = new Transaction({ userID: _idUser, amount: amount, approved: false });
+        const { amount, _idUser, userName } = req.body;
+        const transaction = new Transaction({ userID: _idUser, userName: userName, amount: amount, approved: false });
         const result = await transaction.save();
         res.status(201).json({
             message: "Transaccion solicitada satisfactoriamente",
@@ -36,28 +36,28 @@ exports.getTransactions = async (req, res) => {
 exports.getNonApprovedTransactions = async (req, res) => {
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.page;
-    const TransactionQuery = Transaction.find({ approved: false });
+    const transactionQuery = Transaction.find({ approved: false });
     let fetchedTransactions;
     if (pageSize && currentPage) {
-        userQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+        transactionQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
     }
-    userQuery
-    .then(documents => {
-        fetchedTransactions = documents;
-        return Transaction.count();
-    })
-    .then(count => {
-        res.status(200).json({
-            message: "Transactions fetched successfully!",
-            transaction: fetchedTransactions,
-            maxTransactions: count
+    transactionQuery
+        .then(documents => {
+            fetchedTransactions = documents;
+            return Transaction.countDocuments();
+        })
+        .then(count => {
+            res.status(200).json({
+                message: "Transactions fetched successfully!",
+                transaction: fetchedTransactions,
+                maxTransactions: count
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "Fetching transactions failed!"
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            message: "Fetching transactions failed!"
-        });
-    });
 };
 
 exports.getSelectedTransaction = async (req, res) => {
@@ -77,7 +77,7 @@ exports.getSelectedTransaction = async (req, res) => {
 };
 
 exports.approveTransaction = async (req, res) => {
-    try { 
+    try {
         const { adminID, approved } = req.body;
         const result = await Transaction.updateOne({ _id: req.params.id }, { adminID: adminID, approved: approved });
         if (result.n > 0) {
@@ -93,61 +93,65 @@ exports.approveTransaction = async (req, res) => {
 };
 
 exports.chargeMoney = async (req, res) => {
-    try{
+    try {
         //Usuario al que se la hara la recarga
-        const { transactionData } = req.body;
-        const { idUserToCharge } = req.params.userId;
-        const result = await User.updateOne({ _id: idUserToCharge }, { $set: { 'balance': transactionData.amount } });
-        
+        const chargeId = req.body.idChargeToAuthorize;
+        const charge = await Transaction.findOne({ _id: chargeId });
+        const userId = charge.userID;
+        const amount = charge.amount;
+        const user = await User.findOne({ _id: userId });
+        const newBalance = amount + user.balance;
+        const result = await User.updateOne({ _id: userId }, { balance: newBalance });
+        const transactionUpdate = await Transaction.updateOne({ _id: chargeId }, { approved: true });
+        // Se demora mucho porque hay muchos awaits.
         if (result.n > 0) {
-            res.status(200).json({ message: "Recarga realizada correctamente"});
-        } else{
-            res.status(401).json({ message: "Error al realizar la recarga"});
+            res.status(200).json({ message: "Recarga realizada correctamente" });
+        } else {
+            res.status(401).json({ message: "Error al realizar la recarga" });
         }
-        
+
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
-        })
+        });
     }
 };
 
 exports.deleteCharge = async (req, res) => {
-    try{
-        const collection = mplay.collection('transactions')
-        const { transactionData } = req.body;
-        const result = collection.remove({ _id: transactionData._id})
-
+    try {
+        const chargeId = req.params.id;
+        const result = await Transaction.remove({ _id: chargeId });
         if (result.n > 0) {
-            res.status(200).json({ message: "Recarga eliminada correctamente"});
-        } else{
-            res.status(401).json({ message: "Error al eliminar la recarga"});
+            res.status(200).json({ message: "Recarga eliminada correctamente" });
+        } else {
+            res.status(401).json({ message: "Error al eliminar la recarga" });
         }
-        
+
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
-        })
+        });
     }
 };
 
 exports.getTransactionUser = async (req, res) => {
-    try{
-        const  { transactionData } = req.body;
-        const result = await Transaction.findOne({ _id: transactionData })
+    try {
+
+        const transactionId = req.params.id;
+        const result = await Transaction.findOne({ _id: transactionId });
         const user = await User.findOne({ _id: result.userID });
         if (!user) {
             return res.status(401).json({
                 message: "Credenciales de autenticación inválidas"
             });
         }
-
         const name = user.name;
         const profileData = { name };
         res.status(200).json(profileData);
-    }catch(err) {
+
+    } catch (err) {
         return res.status(401).json({
             message: "Credenciales de autenticacion invalidas"
-        })
+        });
     }
 };
