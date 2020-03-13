@@ -11,7 +11,9 @@ const sportTicketSchema = mongoose.Schema({
         scoreBoard:{ type: String, required: true }
     }],
     closingDate: { type: Date, required: true },
-    creationDate: { type: Date, required: true }
+    creationDate: { type: Date, required: true },
+    isWinner: {type: Boolean, required: false},
+    profit: {type: Number, required: false}
 });
 
 sportTicketSchema.plugin(uniqueValidator);

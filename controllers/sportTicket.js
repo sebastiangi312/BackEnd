@@ -59,3 +59,69 @@ exports.createSportTicket = async (req, res) => {
         });
     }
 };
+
+exports.setSportWinners = async (req, res) => {
+    try {
+        const spTickets = await SportTicket.find();
+        var today = new Date();
+        //la lista de ganadores
+        const spWinners = [];
+
+        spTickets.forEach(async (spTicket) => {
+            //se verifica que el tiquete no se haya evaluado y que ya esté cerrado
+            if(typeof spTicket.winner === "undefined" && today >= spTicket.closingDate){
+                var areCorrect = 0;
+                var won = false;
+                
+                //se cuentan los aciertos en el tiquete
+                spTicket.matchBets.forEach(async (bet) => {
+                    const match = await Match.findById(bet.match);
+                    const userScore = bet.scoreBoard;
+
+                    userScore === match.finalScoreBoard ? areCorrect++ : areCorrect;
+                });
+                
+                //profit es el porcentaje de la ganancia
+                if (areCorrect >= 5){
+                    won = true;
+                    var userProfit = 1;
+
+                    switch (areCorrect) {
+                        case 5:
+                          userProfit = 8;
+                          break;
+                        case 6:
+                          userProfit = 8.5;
+                          break;
+                        case 7:
+                          userProfit = 9;
+                          break;
+                        case 8:
+                          userProfit = 12;
+                          break;
+                        case 9:
+                          userProfit = 17;
+                          break;
+                        default:
+                          userProfit = 25;
+                      }
+                    
+                    //se guarda el id del cliente, el porcentaje de ganancia y el dinero que ganó
+                    spWinners.push([spTicket.userId, userProfit, userProfit*spTicket.betValue]);
+                }
+                //se actualiza el tiquete: si ganó o no y el número de aciertos
+                const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, profit: userProfit});
+
+                if (result.n <= 0) {
+                    res.status(401).json({ message: "Error al actualizar tiquetes deportivos" });
+                }
+            }
+        });
+        res.status(200).json({ message: "Se determinaron los ganadores satisfactoriamente" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: err
+        });
+    }
+};
