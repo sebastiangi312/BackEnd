@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
-const Ticket = require("../models/ticket")
+const Ticket = require("../models/ticket");
+const GLobalBalance = require("../models/globalBalance");
 
 exports.createLottery = async (req, res) => {
     try {
@@ -27,13 +28,14 @@ exports.closeLottery = async (req, res) => {
         const winningNumberFour = lottery.winningNumberFour; 
         const winningNumberFive = lottery.winningNumberFive;
         if  (lottery.closingDate >= Date.now()) {
+            var totalThridPrize = 0;
             const ticket = await Ticket.find({ "lotteryId": req.params.id }).toArray(function (result) {
                 var count = 0;
                 result.firstNumber=== winningNumberOne ? count++ : count;
                 result.secondNumber=== winningNumberTwo ? count++ : count;
                 result.thirdNumber=== winningNumberThree ? count++ : count;
                 result.fourthNumber=== winningNumberFour ? count++ : count;
-                result.firstNumber=== winningNumberOne ? count++ : count;
+                result.firstNumber=== winningNumberFive ? count++ : count;
                 if (count === 5){
                     firstPrizeWinners.push(result.userId);
                 } else if (count === 4){
@@ -48,7 +50,7 @@ exports.closeLottery = async (req, res) => {
                 const results = await User.updateOne({ _id: firstPrizeWinners[ip1]}, { "balance": newBalance});
                 ip1 = ip1 + 1;
              });
-             var ip2 = 0;
+               var ip2 = 0;
                secondPrizeWinners.forEach( async function(secondPrize){
                 const user = await User.findById(secondPrizeWinners[ip2]);
                 var newBalance = user.balance + (secondPrize/secondPrizeWinners.length); 
@@ -58,10 +60,17 @@ exports.closeLottery = async (req, res) => {
              var ip3 = 0;
                thirdPrizeWinners.forEach( async function(thirdPrize){
                 const user = await User.findById(thirdPrizeWinners[ip3]);
-                user.balance = user.balance + thirdPrize; 
+                var newBalance = user.balance + thirdPrize; 
+                const results = await User.updateOne({ _id: secondPrizeWinners[ip3]}, { "balance": newBalance});
                 ip3 = ip3 + 1;
+                totalThridPrize = totalThridPrize + thirdPrize
              });
             });
+            var totalPrize = firstPrize + secondPrize + totalThridPrize;
+            const globalBalance = await GlobalBalance.find();
+            const newValue = globalBalance[0].value - totalPrize;
+            const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
+             
             const result = await Lottery.updateOne({ _id: req.params.id }, { open: false});
             if (result.n > 0) {
                 
