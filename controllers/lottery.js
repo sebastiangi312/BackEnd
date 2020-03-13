@@ -29,7 +29,7 @@ exports.closeLottery = async (req, res) => {
         const winningNumberFive = lottery.winningNumberFive;
         if  (lottery.closingDate >= Date.now()) {
             var totalThridPrize = 0;
-            const ticket = await Ticket.find({ "lotteryId": req.params.id }).toArray(function (result) {
+            const ticket = await Ticket.find({ lotteryId: req.params.id }).toArray(function (result) {
                 var count = 0;
                 result.firstNumber=== winningNumberOne ? count++ : count;
                 result.secondNumber=== winningNumberTwo ? count++ : count;
@@ -47,21 +47,21 @@ exports.closeLottery = async (req, res) => {
                firstPrizeWinners.forEach( async function(firstPrize){
                 const user = await User.findById(firstPrizeWinners[ip1]);
                 var newBalance = user.balance + (firstPrize/firstPrizeWinners.length); 
-                const results = await User.updateOne({ _id: firstPrizeWinners[ip1]}, { "balance": newBalance});
+                const results = await User.updateOne({ _id: firstPrizeWinners[ip1]}, { balance: newBalance});
                 ip1 = ip1 + 1;
              });
                var ip2 = 0;
                secondPrizeWinners.forEach( async function(secondPrize){
                 const user = await User.findById(secondPrizeWinners[ip2]);
                 var newBalance = user.balance + (secondPrize/secondPrizeWinners.length); 
-                const results = await User.updateOne({ _id: secondPrizeWinners[ip2]}, { "balance": newBalance});
+                const results = await User.updateOne({ _id: secondPrizeWinners[ip2]}, { balance: newBalance});
                 ip2 = ip2 + 1;
              });
              var ip3 = 0;
                thirdPrizeWinners.forEach( async function(thirdPrize){
                 const user = await User.findById(thirdPrizeWinners[ip3]);
                 var newBalance = user.balance + thirdPrize; 
-                const results = await User.updateOne({ _id: secondPrizeWinners[ip3]}, { "balance": newBalance});
+                const results = await User.updateOne({ _id: secondPrizeWinners[ip3]}, { balance: newBalance});
                 ip3 = ip3 + 1;
                 totalThridPrize = totalThridPrize + thirdPrize
              });
