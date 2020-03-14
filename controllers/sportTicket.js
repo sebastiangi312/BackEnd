@@ -63,13 +63,12 @@ exports.createSportTicket = async (req, res) => {
 exports.setSportWinners = async (req, res) => {
     try {
         const spTickets = await SportTicket.find();
-        var today = new Date();
+        const today = new Date();
 
         spTickets.forEach(async (spTicket) => {
             //se verifica que el tiquete no se haya evaluado y que ya esté cerrado
             if(typeof spTicket.isWinner === "undefined" && today >= spTicket.closingDate){
                 var areCorrect = 0;
-                var won = false;
                 
                 //se cuentan los aciertos en el tiquete
                 spTicket.matchBets.forEach(async (bet) => {
@@ -83,7 +82,6 @@ exports.setSportWinners = async (req, res) => {
                 //userProfit es el porcentaje de la ganancia
                 var userProfit = 0;
                 if (areCorrect >= 5){
-                    won = true;
                     switch (areCorrect) {
                         case 5:
                           userProfit = 8;
@@ -103,16 +101,13 @@ exports.setSportWinners = async (req, res) => {
                         default:
                           userProfit = 25;
                     }
-                }
-                //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
-                if(won){
-                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, correct: areCorrect, profit: userProfit, awarded: false});
+                    //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
+                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: true, correct: areCorrect, profit: userProfit, awarded: false});
                 } else{
                     //si no ganó, no se guarda el atributo awarded
-                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, correct: areCorrect, profit: userProfit});
+                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: false, correct: areCorrect, profit: userProfit});
                 }
                 
-
                 if (result.n <= 0) {
                     res.status(401).json({ message: "Error al actualizar tiquetes deportivos" });
                 }
