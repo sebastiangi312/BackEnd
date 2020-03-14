@@ -28,8 +28,7 @@ exports.createSportTicket = async (req, res) => {
 
         //Se verifica que el usuario tenga suficiente dinero y se le resta del balance
         const user = await User.findById(userId);
-
-
+        
         if (user.balance < betValue) {
             return res.status(401).json({
                 message: "El usuario no tiene suficiente saldo para realizar esta apuesta"
@@ -109,7 +108,7 @@ exports.setSportWinners = async (req, res) => {
                 }
                 
                 if (result.n <= 0) {
-                    res.status(401).json({ message: "Error al actualizar tiquetes deportivos" });
+                    return res.status(401).json({ message: "Error al determinar los ganadores tiquetes deportivos" });
                 }
             }
         });
@@ -119,8 +118,6 @@ exports.setSportWinners = async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(500).json({
-            message: err
-        });
+        res.status(500).json({ message: err });
     }
 };
