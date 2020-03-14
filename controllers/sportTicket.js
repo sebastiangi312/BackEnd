@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
-const SportBet = require("../models/sportBet");
+const SportTicket = require("../models/sportTicket");
 const Match = require("../models/match");
 const User = require("../models/user");
 const GlobalBalance = require("../models/globalBalance");
 
 
-exports.createSportBet = async (req, res) => {
+exports.createSportTicket = async (req, res) => {
     try {
         const { userId, betValue, matchBets } = req.body;
 
@@ -30,7 +30,7 @@ exports.createSportBet = async (req, res) => {
         const user = await User.findById(userId);
         if (user.balance < betValue) {
             return res.status(401).json({
-                message: "El usuario no tiene suficiente saldo para realizar esta lotería"
+                message: "El usuario no tiene suficiente saldo para realizar esta apuesta"
             });
         } else {
             const newUserBalance = user.balance - betValue;
@@ -50,8 +50,8 @@ exports.createSportBet = async (req, res) => {
             }
 
             // Se crea la apuesta deportiva
-            const sportBet = new SportBet({ userId, betValue, matchBets, closingDate, creationDate: new Date() });
-            const result = await sportBet.save();
+            const sportTicket = new SportTicket({ userId, betValue, matchBets, closingDate, creationDate: new Date() });
+            const result = await sportTicket.save();
             res.status(201).json({
                 message: "Apuesta deportiva creada satisfactoriamente",
                 result: result

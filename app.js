@@ -10,7 +10,7 @@ const transactionRoutes = require("./routes/transaction");
 const ticketRoutes = require("./routes/ticket");
 
 const matchRoutes = require("./routes/match");
-const sportBetRoutes = require("./routes/sportBet");
+const sportTicketRoutes = require("./routes/sportTicket");
 
 const app = express();
 
@@ -49,7 +49,7 @@ app.use("/api/lottery", lotteryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ticket", ticketRoutes);
 app.use("/api/match", matchRoutes);
-app.use("/api/sportBet", sportBetRoutes);
+app.use("/api/sportTicket", sportTicketRoutes);
 app.use("/api/transaction", transactionRoutes);
 
 module.exports = app;
