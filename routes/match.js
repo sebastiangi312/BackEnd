@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post("", checkAuth, checkAuthAdmin, MatchController.createMatch );
 router.get("", checkAuth, MatchController.getMatches );
+router.put("/close",checkAuth, checkAuthAdmin, MatchController.closeMatch);
 
 module.exports = router;
