@@ -63,7 +63,7 @@ exports.createSportTicket = async (req, res) => {
 exports.setSportWinners = async (req, res) => {
     try {
         const spTickets = await SportTicket.find();
-        const today = new Date();
+        var today = new Date();
 
         spTickets.forEach(async (spTicket) => {
             //se verifica que el tiquete no se haya evaluado y que ya esté cerrado
