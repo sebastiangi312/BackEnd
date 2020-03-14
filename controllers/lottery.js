@@ -12,6 +12,17 @@ exports.createLottery = async (req, res) => {
             message: "Lotería creada satisfactoriamente",
             result: result
         });
+        var totalPrize = firstPrize + secondPrize;
+        const globalBalance = await GlobalBalance.find();
+        const newValue = globalBalance[0].value - totalPrize;
+        const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
+        if (editGlobalBalance.n > 0) {
+            res.status(200).json({ message: 'Se desconto el dinero de los primeros premios al bolsillo de los administradores' });
+        } else {
+            res.status(500).json({
+                message: "Error al descontar el dinero de los administradores",
+            });
+        };
     } catch (err) {
         return res.status(500).json({
             message: "Internal server error"
@@ -48,6 +59,13 @@ exports.closeLottery = async (req, res) => {
                 const user = await User.findById(firstPrizeWinners[ip1]);
                 var newBalance = user.balance + (firstPrize/firstPrizeWinners.length); 
                 const results = await User.updateOne({ _id: firstPrizeWinners[ip1]}, { balance: newBalance});
+                if (results.n > 0) {
+                    res.status(200).json({ message: 'Se repartieron los respectivos premios' });
+                } else {
+                    res.status(500).json({
+                        message: "Error al repartir los premios",
+                    });
+                }
                 ip1 = ip1 + 1;
              });
                var ip2 = 0;
@@ -55,6 +73,13 @@ exports.closeLottery = async (req, res) => {
                 const user = await User.findById(secondPrizeWinners[ip2]);
                 var newBalance = user.balance + (secondPrize/secondPrizeWinners.length); 
                 const results = await User.updateOne({ _id: secondPrizeWinners[ip2]}, { balance: newBalance});
+                if (results.n > 0) {
+                    res.status(200).json({ message: 'Se repartieron los respectivos premios' });
+                } else {
+                    res.status(500).json({
+                        message: "Error al repartir los premios",
+                    });
+                }
                 ip2 = ip2 + 1;
              });
              var ip3 = 0;
@@ -62,15 +87,28 @@ exports.closeLottery = async (req, res) => {
                 const user = await User.findById(thirdPrizeWinners[ip3]);
                 var newBalance = user.balance + thirdPrize; 
                 const results = await User.updateOne({ _id: secondPrizeWinners[ip3]}, { balance: newBalance});
+                if (results.n > 0) {
+                    res.status(200).json({ message: 'Se repartieron los respectivos premios' });
+                } else {
+                    res.status(500).json({
+                        message: "Error al repartir los premios",
+                    });
+                }
                 ip3 = ip3 + 1;
-                totalThridPrize = totalThridPrize + thirdPrize
+                totalThridPrize = totalThridPrize + thirdPrize;
              });
             });
-            var totalPrize = firstPrize + secondPrize + totalThridPrize;
+            var totalPrize = totalThridPrize;
             const globalBalance = await GlobalBalance.find();
             const newValue = globalBalance[0].value - totalPrize;
             const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
-             
+            if (editGlobalBalance.n > 0) {
+                res.status(200).json({ message: 'Se desconto el dinero de los ganadores del tercer premio a los administradores' });
+            } else {
+                res.status(500).json({
+                    message: "Error al descontar el dinero de los administradores",
+                });
+            }
             const result = await Lottery.updateOne({ _id: req.params.id }, { open: false});
             if (result.n > 0) {
                 
