@@ -34,7 +34,6 @@ exports.userLogin = async (req, res) => {
                 message: "Credenciales de autenticación inválidas"
             });
         }
-
         let payload = { email: user.email, userId: user._id };
         const token = jwt.sign(
             payload, process.env.JWT_KEY,
@@ -147,7 +146,6 @@ exports.deauthorizeUser = async (req, res) => {
         });
     }
 };
-
 
 exports.getNonSubUsers = async (req, res) => {
     const pageSize = +req.query.pagesize;
