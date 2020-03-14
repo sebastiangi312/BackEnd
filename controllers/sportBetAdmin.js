@@ -18,7 +18,6 @@ exports.createSportBetAdmin = async (req, res) => {
         });
     }
 };
-
 exports.setSportEarnings = async (req, res) => {
     try {
         const spTickets = await SportTicket.find();
