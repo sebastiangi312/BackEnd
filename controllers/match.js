@@ -31,3 +31,25 @@ exports.getMatches = async (req, res) => {
         });
     }
 };
+
+exports.closeMatch = async(req, res) => {
+    try{
+        const { matchId, finalScoreBoard } = req.body;
+        
+        const updateMatch = await Match.updateOne({_id: matchId},{finalScoreBoard, open: false});
+
+        if (updateMatch.n > 0) {
+            res.status(200).json({ message: 'Se cerró satisfactoriamente' });
+        } else {
+            res.status(500).json({
+                message: "closing match failed!",
+            });
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: err
+        });
+    }
+}

@@ -97,7 +97,7 @@ exports.chargeMoney = async (req, res) => {
         //Usuario al que se la hara la recarga
         const chargeId = req.body.idChargeToAuthorize;
         const charge = await Transaction.findOne({ _id: chargeId });
-        const userId = charge.userID
+        const userId = charge.userID;
         const amount = charge.amount;
         const user = await User.findOne({ _id: userId });
         const newBalance = amount + user.balance;
@@ -113,14 +113,14 @@ exports.chargeMoney = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
-        })
+        });
     }
 };
 
 exports.deleteCharge = async (req, res) => {
     try {
         const chargeId = req.params.id;
-        const result = await Transaction.remove({ _id: chargeId })
+        const result = await Transaction.remove({ _id: chargeId });
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga eliminada correctamente" });
         } else {
@@ -130,7 +130,7 @@ exports.deleteCharge = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: "Usuario no autorizado"
-        })
+        });
     }
 };
 
@@ -138,7 +138,7 @@ exports.getTransactionUser = async (req, res) => {
     try {
 
         const transactionId = req.params.id;
-        const result = await Transaction.findOne({ _id: transactionId })
+        const result = await Transaction.findOne({ _id: transactionId });
         const user = await User.findOne({ _id: result.userID });
         if (!user) {
             return res.status(401).json({
@@ -152,6 +152,6 @@ exports.getTransactionUser = async (req, res) => {
     } catch (err) {
         return res.status(401).json({
             message: "Credenciales de autenticacion invalidas"
-        })
+        });
     }
 };
