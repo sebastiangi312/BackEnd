@@ -64,12 +64,10 @@ exports.setSportWinners = async (req, res) => {
     try {
         const spTickets = await SportTicket.find();
         var today = new Date();
-        //el dinero total de los premios
-        var globalDebt = 0;
 
         spTickets.forEach(async (spTicket) => {
             //se verifica que el tiquete no se haya evaluado y que ya esté cerrado
-            if(typeof spTicket.winner === "undefined" && today >= spTicket.closingDate){
+            if(typeof spTicket.isWinner === "undefined" && today >= spTicket.closingDate){
                 var areCorrect = 0;
                 var won = false;
                 
@@ -78,7 +76,9 @@ exports.setSportWinners = async (req, res) => {
                     const match = await Match.findById(bet.match);
                     const userScore = bet.scoreBoard;
 
-                    userScore === match.finalScoreBoard ? areCorrect++ : areCorrect;
+                    if(userScore === match.finalScoreBoard){
+                        areCorrect = areCorrect + 1;
+                    }
                 });
                 //userProfit es el porcentaje de la ganancia
                 var userProfit = 0;
@@ -102,34 +102,25 @@ exports.setSportWinners = async (req, res) => {
                           break;
                         default:
                           userProfit = 25;
-                      }
-                    
-                    //se Actualiza el balance del usuario sumandole el dinero ganado
-                    const user = await User.findById(spTicket.user);
-                    var newBalance = user.balance + (userProfit*spTicket.betValue); 
-                    const results = await User.updateOne({ _id: spTicket.user}, { balance: newBalance});
-                    //Se actualiza la deuda global
-                    globalDebt = globalDebt + (userProfit*spTicket.betValue);
+                    }
                 }
-                //se actualiza el tiquete: si ganó o no y el porcentaje que ganó
-                const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, profit: userProfit});
+                //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
+                if(won){
+                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, correct: areCorrect, profit: userProfit, awarded: false});
+                } else{
+                    //si no ganó, no se guarda el atributo awarded
+                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: won, correct: areCorrect, profit: userProfit});
+                }
+                
 
                 if (result.n <= 0) {
                     res.status(401).json({ message: "Error al actualizar tiquetes deportivos" });
                 }
             }
         });
-        //se le resta la deuda global al balance global
-        const globalBalance = await GlobalBalance.find();
-        const newValue = globalBalance[0].value - globalDebt;
-        const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
 
-        if (editGlobalBalance.n > 0) {
-            res.status(200).json({ message: 'Se determinaron los ganadores satisfactoriamente y se repartieron los respectivos premios' });
-        } else {
-            res.status(500).json({
-                message: "Error al repartir los premios",
-            });
+        if (result.n > 0) {
+            res.status(200).json({ message: 'Se determinaron los ganadores satisfactoriamente' });
         }
     } catch (err) {
         console.log(err);
