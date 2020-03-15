@@ -2,15 +2,12 @@ const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
 const Ticket = require("../models/ticket");
 const GLobalBalance = require("../models/globalBalance");
-const User = require("../models/user");
-const mongoose = require('mongoose');
 
 exports.createLottery = async (req, res) => {
     try {
         const { fare, closingDate, firstPrize, secondPrize, thirdPrize } = req.body;
         const lottery = new Lottery({ fare, closingDate, firstPrize, secondPrize, thirdPrize, creationDate: new Date(), open: true });
         const result = await lottery.save();
-        setTimeout(function () { console.log("Hello"); }, 10000);
         res.status(201).json({
             message: "Lotería creada satisfactoriamente",
             result: result
@@ -45,18 +42,17 @@ exports.closeLottery = async (req, res) => {
             var totalThridPrize = 0;
             const ticket = await Ticket.find({ lotteryId: req.params.id }).toArray(function (result) {
                 var count = 0;
-                ticket.firstNumber === winningNumbers[0] ? count++ : count;
-                ticket.secondNumber === winningNumbers[1] ? count++ : count;
-                ticket.thirdNumber === winningNumbers[2] ? count++ : count;
-                ticket.fourthNumber === winningNumbers[3] ? count++ : count;
-                ticket.fifthNumber === winningNumbers[4] ? count++ : count;
-
-                if (count === 5) {
-                    firstPrizeWinners.push(ticket.userId);
-                } else if (count === 4) {
-                    secondPrizeWinners.push(ticket.userId);
-                } else if (count === 3) {
-                    thirdPrizeWinners.push(ticket.userId);
+                result.firstNumber=== winningNumberOne ? count++ : count;
+                result.secondNumber=== winningNumberTwo ? count++ : count;
+                result.thirdNumber=== winningNumberThree ? count++ : count;
+                result.fourthNumber=== winningNumberFour ? count++ : count;
+                result.firstNumber=== winningNumberFive ? count++ : count;
+                if (count === 5){
+                    firstPrizeWinners.push(result.userId);
+                } else if (count === 4){
+                    secondPrizeWinners.push(result.userId);
+                } else if (count === 3){
+                    thirdPrizeWinners.push(result.userId);
                 }
                var ip1 = 0;
                firstPrizeWinners.forEach( async function(firstPrize){
@@ -102,54 +98,34 @@ exports.closeLottery = async (req, res) => {
                 totalThridPrize = totalThridPrize + thirdPrize;
              });
             });
-
-            firstPrizeWinners.forEach(async (userId) => {
-                const user = await User.findById(userId);
-                const newBalance = user.balance + (lottery.firstPrize / firstPrizeWinners.length);
-                const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
-            });
-
-            secondPrizeWinners.forEach(async (userId) => {
-                const user = await User.findById(userId);
-                var newBalance = user.balance + (lottery.secondPrize / secondPrizeWinners.length);
-                const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
-            });
-
-            thirdPrizeWinners.forEach(async (userId) => {
-                const user = await User.findById(userId);
-                var newBalance = user.balance + (lottery.thirdPrize / thirdPrizeWinners.length);
-                const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
-            });
-
-            const firstPrizeWinnersOId = firstPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
-            const secondPrizeWinnersOId = secondPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
-            const thirdPrizeWinnersOId = thirdPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
-
-            const updateLottery = await Lottery
-                .updateOne({ _id: lotteryId },
-                    {
-                        open: false,
-                        winningNumbers: winningNumbers,
-                        firstPrizeWinners: firstPrizeWinnersOId,
-                        secondPrizeWinners: secondPrizeWinnersOId,
-                        thirdPrizeWinners: thirdPrizeWinnersOId
-                    });
-            if (updateLottery.n > 0) {
+            var totalPrize = totalThridPrize;
+            const globalBalance = await GlobalBalance.find();
+            const newValue = globalBalance[0].value - totalPrize;
+            const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
+            if (editGlobalBalance.n > 0) {
+                res.status(200).json({ message: 'Se desconto el dinero de los ganadores del tercer premio a los administradores' });
+            } else {
+                res.status(500).json({
+                    message: "Error al descontar el dinero de los administradores",
+                });
+            }
+            const result = await Lottery.updateOne({ _id: req.params.id }, { open: false});
+            if (result.n > 0) {
+                
                 res.status(200).json({ message: 'Se cerro satisfactoriamente' });
             } else {
                 res.status(500).json({
-                    message: "closing lottery failed! 1",
+                    message: "closing lottery failed!"
                 });
             }
         } else {
             res.status(500).json({
-                message: "closing lottery failed! 2"
+                message: "closing lottery failed!"
             });
         }
-    } catch (err) {
-        console.log(err);
+    } catch {
         res.status(500).json({
-            message: err
+            message: "closing lottery failed!"
         });
     }
 };
@@ -216,14 +192,14 @@ exports.deleteLottery = async (req, res) => {
     try {
         const anyTicket = await Ticket.findOne({ lotteryId: req.params.id });
 
-        if (!anyTicket) {
+        if(!anyTicket){
             const result = await Lottery.deleteOne({ _id: req.params.id });
             if (result.n > 0) {
                 res.status(200).json({ message: "Deleting lottery was successful!" });
             } else {
                 res.status(500).json({ message: "Deleting lottery failed!" });
             }
-        } else {
+        } else{
             res.status(500).json({ message: "Deleting lottery failed!" });
         }
     } catch {

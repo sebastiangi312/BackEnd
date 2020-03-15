@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
 const Ticket = require("../models/ticket");
+<<<<<<< HEAD
 const GLobalBalance = require("../models/globalBalance");
+=======
 const User = require("../models/user");
 const mongoose = require('mongoose');
+>>>>>>> upstream/master
 
 exports.createLottery = async (req, res) => {
     try {
@@ -35,6 +38,7 @@ exports.createLottery = async (req, res) => {
 
 exports.closeLottery = async (req, res) => {
     try {
+<<<<<<< HEAD
         const lottery = await Lottery.findById(req.params.id);
         const winningNumberOne = lottery.winningNumberOne; 
         const winningNumberTwo = lottery.winningNumberTwo; 
@@ -45,18 +49,17 @@ exports.closeLottery = async (req, res) => {
             var totalThridPrize = 0;
             const ticket = await Ticket.find({ lotteryId: req.params.id }).toArray(function (result) {
                 var count = 0;
-                ticket.firstNumber === winningNumbers[0] ? count++ : count;
-                ticket.secondNumber === winningNumbers[1] ? count++ : count;
-                ticket.thirdNumber === winningNumbers[2] ? count++ : count;
-                ticket.fourthNumber === winningNumbers[3] ? count++ : count;
-                ticket.fifthNumber === winningNumbers[4] ? count++ : count;
-
-                if (count === 5) {
-                    firstPrizeWinners.push(ticket.userId);
-                } else if (count === 4) {
-                    secondPrizeWinners.push(ticket.userId);
-                } else if (count === 3) {
-                    thirdPrizeWinners.push(ticket.userId);
+                result.firstNumber=== winningNumberOne ? count++ : count;
+                result.secondNumber=== winningNumberTwo ? count++ : count;
+                result.thirdNumber=== winningNumberThree ? count++ : count;
+                result.fourthNumber=== winningNumberFour ? count++ : count;
+                result.firstNumber=== winningNumberFive ? count++ : count;
+                if (count === 5){
+                    firstPrizeWinners.push(result.userId);
+                } else if (count === 4){
+                    secondPrizeWinners.push(result.userId);
+                } else if (count === 3){
+                    thirdPrizeWinners.push(result.userId);
                 }
                var ip1 = 0;
                firstPrizeWinners.forEach( async function(firstPrize){
@@ -102,6 +105,45 @@ exports.closeLottery = async (req, res) => {
                 totalThridPrize = totalThridPrize + thirdPrize;
              });
             });
+            var totalPrize = totalThridPrize;
+            const globalBalance = await GlobalBalance.find();
+            const newValue = globalBalance[0].value - totalPrize;
+            const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
+            if (editGlobalBalance.n > 0) {
+                res.status(200).json({ message: 'Se desconto el dinero de los ganadores del tercer premio a los administradores' });
+            } else {
+                res.status(500).json({
+                    message: "Error al descontar el dinero de los administradores",
+                });
+            }
+            const result = await Lottery.updateOne({ _id: req.params.id }, { open: false});
+            if (result.n > 0) {
+                
+=======
+        const lotteryId = req.body.id
+        const lottery = await Lottery.findById(lotteryId);
+        const firstPrizeWinners = [];
+        const secondPrizeWinners = [];
+        const thirdPrizeWinners = [];
+        const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 46));
+        if (lottery.closingDate <= Date.now() && lottery.open) {
+            const tickets = await Ticket.find({ lotteryId: lotteryId });
+            tickets.forEach(ticket => {
+                var count = 0;
+                ticket.firstNumber === winningNumbers[0] ? count++ : count;
+                ticket.secondNumber === winningNumbers[1] ? count++ : count;
+                ticket.thirdNumber === winningNumbers[2] ? count++ : count;
+                ticket.fourthNumber === winningNumbers[3] ? count++ : count;
+                ticket.fifthNumber === winningNumbers[4] ? count++ : count;
+
+                if (count === 5) {
+                    firstPrizeWinners.push(ticket.userId);
+                } else if (count === 4) {
+                    secondPrizeWinners.push(ticket.userId);
+                } else if (count === 3) {
+                    thirdPrizeWinners.push(ticket.userId);
+                }
+            });
 
             firstPrizeWinners.forEach(async (userId) => {
                 const user = await User.findById(userId);
@@ -135,6 +177,7 @@ exports.closeLottery = async (req, res) => {
                         thirdPrizeWinners: thirdPrizeWinnersOId
                     });
             if (updateLottery.n > 0) {
+>>>>>>> upstream/master
                 res.status(200).json({ message: 'Se cerro satisfactoriamente' });
             } else {
                 res.status(500).json({
