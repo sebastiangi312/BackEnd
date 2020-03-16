@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const Ticket = require("../models/ticket");
+const SportTicket = require("../models/sportTicket");
+const Match = require("../models/match");
+const Lottery = require("../models/lottery");
 
 exports.createUser = async (req, res) => {
 
@@ -25,13 +29,13 @@ exports.userLogin = async (req, res) => {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(401).json({
-                message: "Credenciales de autenticación inválidas",
+                message: "1. Credenciales de autenticación inválidas",
             });
         }
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (!validPassword) {
             return res.status(401).json({
-                message: "Credenciales de autenticación inválidas"
+                message: "2. Credenciales de autenticación inválidas"
             });
         }
         let payload = { email: user.email, userId: user._id };
@@ -46,7 +50,7 @@ exports.userLogin = async (req, res) => {
         });
     } catch (err) {
         return res.status(401).json({
-            message: "Credenciales de autenticación inválidas"
+            message: "3. Credenciales de autenticación inválidas"
         });
     }
 };
@@ -56,7 +60,7 @@ exports.getCurrentUser = async (req, res) => {
         const user = await User.findById(req.params.userId);
         if (!user) {
             return res.status(401).json({
-                message: "Credenciales de autenticación inválidas"
+                message: "4. Credenciales de autenticación inválidas"
             });
         }
         // teléfono, correo y contraseña
@@ -71,7 +75,7 @@ exports.getCurrentUser = async (req, res) => {
         res.status(200).json(profileData);
     } catch (err) {
         return res.status(401).json({
-            message: "Credenciales de autenticación inválidas"
+            message: "5. Credenciales de autenticación inválidas"
         });
     }
 };
@@ -79,9 +83,9 @@ exports.getCurrentUser = async (req, res) => {
 exports.editUser = async (req, res) => {
     try {
         const { _id, email, phone, password, newPassword } = req.body;
-        const user = await User.findById(req.params.userId);
+        const user = await User.findById(req.userData.userId);
         if (newPassword === '') {
-            const result = await User.updateOne({ _id: req.params.userId }, { email: email, phone: phone });
+            const result = await User.updateOne({ _id: req.userData.userId }, { phone: phone });
             if (result.n > 0) {
                 res.status(200).json({ message: "Update successful!" });
             } else {
@@ -91,7 +95,7 @@ exports.editUser = async (req, res) => {
             const validPassword = await bcrypt.compare(password, user.password);
             if (validPassword) {
                 const hashedPassword = await bcrypt.hash(newPassword, 10);
-                const result = await User.updateOne({ _id: req.params.userId }, { email: email, phone: phone, password: hashedPassword });
+                const result = await User.updateOne({ _id: req.params.userId }, { phone: phone, password: hashedPassword });
                 if (result.n > 0) {
                     res.status(200).json({ message: "Update successful!" });
                 } else {
@@ -200,3 +204,68 @@ exports.getAuthorizedUsers = async (req, res) => {
             });
         });
 };
+
+
+// START My Tickets
+
+exports.getSportTickets = async (req, res) => {
+    try {
+        const userId = req.userData.userId;
+        const sportTickets = await SportTicket.find({ user: userId });
+        res.status(200).json({
+            message: 'Tickets deportivos traídos satisfactoriamente',
+            tickets: sportTickets
+        })
+    } catch {
+        res.status(500).json({
+            message: 'Error trayendo los tickets deportivos'
+        })
+    }
+};
+
+exports.getLotteryTickets = async (req, res) => {
+    try {
+        const userId = req.userData.userId;
+        const tickets = await Ticket.find({ userId: userId });
+        res.status(200).json({
+            message: 'Tickets de lotería traídos satisfactoriamente',
+            tickets: tickets
+        })
+    } catch {
+        res.status(500).json({
+            message: 'Error trayendo los tickets de lotería'
+        })
+    }
+}
+
+exports.getLotteries = async (req, res) => {
+    try {
+        const ids = req.query.ids;
+        const lotteries = await Lottery.find().where('_id').in(ids).exec();
+        res.status(200).json({
+            message: 'Loterías traídas satisfactoriamente',
+           lotteries: lotteries
+        })
+    } catch {
+        res.status(500).json({
+            message: 'Error trayendo loterías'
+        })
+    }
+};
+
+exports.getMatches = async (req, res) => {
+    try {
+        const ids = req.query.ids;
+        const matches = await Match.find().where('_id').in(ids).exec();
+        res.status(200).json({
+            message: 'Matches traídos satisfactoriamente',
+            matches: matches
+        })
+    } catch {
+        res.status(500).json({
+            message: 'Error trayendo matches'
+        })
+    }
+};
+
+// END My Tickets
