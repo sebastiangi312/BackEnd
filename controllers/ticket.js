@@ -17,7 +17,7 @@ exports.createLotteryTicket = async (req, res) => {
             });
         } else {
             // Verifica que la loteria este abierta
-            if (lottery.open){
+            if (lottery.open) {
                 // Ajusta el balance del usuario
                 const newUserBalance = user.balance - lottery.fare;
                 const result1 = await User.updateOne({ _id: userId }, { balance: newUserBalance });

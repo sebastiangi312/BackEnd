@@ -10,18 +10,18 @@ exports.createSportTicket = async (req, res) => {
         const { userId, betValue, matchBets } = req.body;
 
         // Se verifica que apueste para al menos 5 partidos
-        if(matchBets.length < 5){
+        if (matchBets.length < 5) {
             return res.status(406).json({
                 message: "Es necesario registrar al menos 5 apuestas"
             });
         }
 
         // Se encuentra la fecha del último partido
-        var closingDate= null;
+        var closingDate = null;
 
         for (const matchBet of matchBets) {
             var match = await Match.findById(matchBet.match);
-            if(!closingDate || closingDate < match.matchDate){
+            if (!closingDate || closingDate < match.matchDate) {
                 closingDate = match.matchDate;
             }
         }

@@ -4,6 +4,6 @@ const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
-router.post("", checkAuth, SportTicketController.createSportTicket );
+router.post("", checkAuth, SportTicketController.createSportTicket);
 
 module.exports = router;
