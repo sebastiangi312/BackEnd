@@ -9,4 +9,8 @@ router.post("", checkAuth, checkAuthAdmin, MatchController.createMatch );
 router.get("", checkAuth, MatchController.getMatches );
 router.put("/close",checkAuth, checkAuthAdmin, MatchController.closeMatch);
 
+router.get("/openMatches",checkAuth, checkAuthAdmin, MatchController.getOpenMatches);
+router.get("/nonFilled",checkAuth, checkAuthAdmin, MatchController.getNonFilledMatches);
+router.put("/saveScores", checkAuth, checkAuthAdmin, MatchController.saveScores);
+
 module.exports = router;
