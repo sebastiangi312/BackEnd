@@ -86,25 +86,21 @@ exports.setSportWinners = async (req, res) => {
                 //userProfit es el porcentaje de la ganancia
                 var userProfit = 0;
                 if (areCorrect >= 5){
-                    switch (areCorrect) {
-                        case 5:
-                          userProfit = 8;
-                          break;
-                        case 6:
-                          userProfit = 8.5;
-                          break;
-                        case 7:
-                          userProfit = 9;
-                          break;
-                        case 8:
-                          userProfit = 12;
-                          break;
-                        case 9:
-                          userProfit = 17;
-                          break;
-                        default:
-                          userProfit = 25;
+                    //determina cuánto es el porcentaje de la ganancia
+                    if(areCorrect === 5){
+                        userProfit = 8;
+                    }else if(areCorrect === 6){
+                        userProfit = 8.5;
+                    }else if(areCorrect === 7){
+                        userProfit = 9;
+                    }else if(areCorrect === 8){
+                        userProfit = 12;
+                    }else if(areCorrect === 9){
+                        userProfit = 17;
+                    }else{
+                        userProfit = 25;
                     }
+
                     //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
                     const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: true, correct: areCorrect, profit: userProfit, awarded: false});
                 } else{
