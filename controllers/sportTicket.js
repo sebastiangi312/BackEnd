@@ -104,7 +104,7 @@ exports.setSportWinners = async (req, res) => {
                     }
 
                     //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
-                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: true, correct: areCorrect, profit: userProfit, awarded: false});
+                    const result = await SportTicket.updateOne({ _id: spTicket._id }, {isWinner: true, correct: areCorrect, profit: userProfit, awarded: false});
                     if (result.n > 0) {
                         res.status(200).json({ message: 'Ticket ganador actualizado correctamente' });
                     } else{
@@ -112,7 +112,7 @@ exports.setSportWinners = async (req, res) => {
                     }
                 } else{
                     //si no ganó, no se guarda el atributo awarded
-                    const result = await SportTicket.updateOne({ _id: spTicket.id }, {isWinner: false, correct: areCorrect, profit: userProfit});
+                    const result = await SportTicket.updateOne({ _id: spTicket._id }, {isWinner: false, correct: areCorrect, profit: userProfit});
                     if (result.n > 0) {
                         res.status(200).json({ message: 'Ticket no ganador actualizado correctamente' });
                     } else{
