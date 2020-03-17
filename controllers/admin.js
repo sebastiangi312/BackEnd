@@ -19,9 +19,15 @@ exports.editGlobalBalance = async (req, res) => {
         const globalBalance = await GlobalBalance.find();
         const newValue = globalBalance[0].value - req.body.value;
         const editGlobalBalance = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
-        res.status(201).json({
-            message: "Balance global actualizado"
-        });
+        if (editGlobalBalance.n > 0) {
+            res.status(201).json({
+                message: "Balance global actualizado"
+            });
+        } else {
+            return res.status(500).json({
+                message: "Internal server error"
+            });
+        }
     } catch (err) {
         return res.status(500).json({
             message: "Internal server error"
