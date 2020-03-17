@@ -52,7 +52,7 @@ exports.createSportTicket = async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(req.body);
+        console.log(err);
         return res.status(500).json({
             message: "Internal server error"
         });
