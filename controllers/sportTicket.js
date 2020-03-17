@@ -16,7 +16,7 @@ exports.createSportTicket = async (req, res) => {
         }
 
         // Se encuentra la fecha del último partido
-        const ids = matcheBets.map(matchBet => matchBet.match);
+        const ids = matchBets.map(matchBet => matchBet.match);
         const matches = await Match.find().where('_id').in(ids).exec();
         const dates = matches.map(match => new Date(match.matchDate));
         const closingDate = new Date(Math.max.apply(null, dates));
@@ -44,7 +44,7 @@ exports.createSportTicket = async (req, res) => {
             }
 
             // Se crea la apuesta deportiva
-            const sportTicket = new SportTicket({ userId, betValue, matchBets, closingDate, creationDate: new Date() });
+            const sportTicket = new SportTicket({ user: userId, betValue, matchBets, closingDate, creationDate: new Date() });
             const result = await sportTicket.save();
             res.status(201).json({
                 message: "Apuesta deportiva creada satisfactoriamente",
@@ -52,7 +52,7 @@ exports.createSportTicket = async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);
+        console.log(req.body);
         return res.status(500).json({
             message: "Internal server error"
         });
