@@ -40,27 +40,47 @@ exports.closeLottery = async (req, res) => {
                 ticket.fifthNumber === winningNumbers[4] ? count++ : count;
 
                 if (count === 5) {
-                    firstPrizeWinners.push(ticket.userId);
+                    firstPrizeWinners.push(ticket._id);
                 } else if (count === 4) {
-                    secondPrizeWinners.push(ticket.userId);
+                    secondPrizeWinners.push(ticket._id);
                 } else if (count === 3) {
-                    thirdPrizeWinners.push(ticket.userId);
+                    thirdPrizeWinners.push(ticket._id);
                 }
             });
 
-            firstPrizeWinners.forEach(async (userId) => {
+            /**
+             * Se puede mejorar
+             * https://stackoverflow.com/questions/38742475/what-is-the-right-approach-to-update-many-records-in-mongodb-using-mongoose
+             * 
+             * O con esto (no lo he probado):
+             * 
+             * const userIds = firstPrizeWinners.map(ticketId => {
+             *  let ticket = tickets.find(t => t._id === ticketId)
+             *  return ticket.userId
+             * });
+             * 
+             * User.updateMany( { _id: { "$in": userIds } }, { $inc: { balance: firstPrize } } )
+             */
+            firstPrizeWinners.forEach(async (ticketId) => {
+                // find de array, no de mongo
+                const ticket = tickets.find(ticket => ticket._id === ticketId);
+                const userId = ticket.userId;
                 const user = await User.findById(userId);
                 const newBalance = user.balance + (lottery.firstPrize / firstPrizeWinners.length);
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
             });
 
-            secondPrizeWinners.forEach(async (userId) => {
+            secondPrizeWinners.forEach(async (ticketId) => {
+                const ticket = tickets.find(ticket => ticket._id === ticketId);
+                const userId = ticket.userId;
                 const user = await User.findById(userId);
                 var newBalance = user.balance + (lottery.secondPrize / secondPrizeWinners.length);
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
             });
 
-            thirdPrizeWinners.forEach(async (userId) => {
+            thirdPrizeWinners.forEach(async (ticketId) => {
+                const ticket = tickets.find(ticket => ticket._id === ticketId);
+                const userId = ticket.userId;
                 const user = await User.findById(userId);
                 var newBalance = user.balance + (lottery.thirdPrize / thirdPrizeWinners.length);
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });

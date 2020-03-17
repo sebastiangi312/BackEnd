@@ -8,9 +8,9 @@ const lotterySchema = mongoose.Schema({
     secondPrize: { type: Number, required: true },
     thirdPrize: { type: Number, required: true },
     winningNumbers: [{ type: Number, required: false }],
-    firstPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }],
-    secondPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }],
-    thirdPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }],
+    firstPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket", required: false }],
+    secondPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket", required: false }],
+    thirdPrizeWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ticket", required: false }],
     creationDate: { type: Date, required: true },
     open: { type: Boolean, required: true }
 });
