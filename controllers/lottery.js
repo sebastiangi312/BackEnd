@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const Lottery = require("../models/lottery");
 const Ticket = require("../models/ticket");
 const User = require("../models/user");
+const GlobalBalance = require("../models/globalBalance");
 const mongoose = require('mongoose');
 
 exports.createLottery = async (req, res) => {
@@ -61,6 +62,7 @@ exports.closeLottery = async (req, res) => {
              * 
              * User.updateMany( { _id: { "$in": userIds } }, { $inc: { balance: firstPrize } } )
              */
+
             firstPrizeWinners.forEach(async (ticketId) => {
                 // find de array, no de mongo
                 const ticket = tickets.find(ticket => ticket._id === ticketId);
@@ -74,7 +76,7 @@ exports.closeLottery = async (req, res) => {
                 const ticket = tickets.find(ticket => ticket._id === ticketId);
                 const userId = ticket.userId;
                 const user = await User.findById(userId);
-                var newBalance = user.balance + (lottery.secondPrize / secondPrizeWinners.length);
+                const newBalance = user.balance + (lottery.secondPrize / secondPrizeWinners.length);
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
             });
 
@@ -82,9 +84,29 @@ exports.closeLottery = async (req, res) => {
                 const ticket = tickets.find(ticket => ticket._id === ticketId);
                 const userId = ticket.userId;
                 const user = await User.findById(userId);
-                var newBalance = user.balance + (lottery.thirdPrize / thirdPrizeWinners.length);
+                const newBalance = user.balance + (lottery.thirdPrize / thirdPrizeWinners.length);
                 const updateUser = await User.updateOne({ _id: userId }, { balance: newBalance });
             });
+
+            // Update globalBalance
+            let total = 0;
+            if (firstPrizeWinners.length > 0) {
+                total -= lottery.firstPrize;
+            }
+            if (secondPrizeWinners.length > 0) {
+                total -= lottery.secondPrize;
+            }
+            if (thirdPrizeWinners.length > 0) {
+                total -= lottery.thirdPrize;
+            }
+
+            const globalBalanceUpdate = await GlobalBalance.update({}, { $inc: { value: total } });
+
+            if (globalBalanceUpdate.n > 0) {
+                console.log('Updated global balance');
+            } else {
+                console.log('Error updating global balance');
+            }
 
             const firstPrizeWinnersOId = firstPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));
             const secondPrizeWinnersOId = secondPrizeWinners.map(userId => mongoose.Types.ObjectId(userId));

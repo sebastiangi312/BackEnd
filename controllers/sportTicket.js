@@ -36,9 +36,7 @@ exports.createSportTicket = async (req, res) => {
                     message: "Ocurrió un error al restar el valor del saldo del usuario"
                 });
             }
-            const globalBalance = await GlobalBalance.find();
-            const newValue = globalBalance[0].value + betValue;
-            const result2 = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
+            const result2 = await GlobalBalance.update({}, { $inc: { value: betValue } });
             if (result2.n <= 0) {
                 return res.status(401).json({
                     message: "Ocurrió un error al ajustar el balance global"
