@@ -46,7 +46,14 @@ exports.userLogin = async (req, res) => {
         res.status(200).json({
             token: token,
             expiresIn: 3600,
-            userId: user._id
+            userId: user._id,
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            birthdate: new Date(user.birthdate),
+            phone: user.phone,
+            balance: user.balance,
+            roles: user.roles
         });
     } catch (err) {
         return res.status(401).json({
@@ -244,7 +251,7 @@ exports.getLotteries = async (req, res) => {
         const lotteries = await Lottery.find().where('_id').in(ids).exec();
         res.status(200).json({
             message: 'Loterías traídas satisfactoriamente',
-           lotteries: lotteries
+            lotteries: lotteries
         })
     } catch {
         res.status(500).json({
