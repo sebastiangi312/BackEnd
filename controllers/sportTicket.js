@@ -98,8 +98,15 @@ exports.setSportWinners = async (req, res) => {
                         userProfit = 25;
                     }
 
+                    if (!spTicket.awarded) {
+                        const winnings = spTicket.betValue * userProfit;
+                        const userUpdate = await User.updateOne({ _id: spTicket.user }, { $inc: { balance: winnings } });
+                        const globalBalanceUpdate = await GlobalBalance.updateOne({}, { $inc: { value: -winnings } });
+                    }
+                    // Todo esto es un poco ineficiente. Podría irse metiendo los usuarios en un array e 
+                    // ir sumando al total y abajo hacer un updateMany con esos arrays y el return.status.json
                     //se actualiza el tiquete: si ganó o no, cuántas acertó y el porcentaje que ganó
-                    const result = await SportTicket.updateOne({ _id: spTicket._id }, { isWinner: true, correct: areCorrect, profit: userProfit, awarded: false });
+                    const result = await SportTicket.updateOne({ _id: spTicket._id }, { isWinner: true, correct: areCorrect, profit: userProfit, awarded: true });
                     if (result.n > 0) {
                         res.status(200).json({ message: 'Ticket ganador actualizado correctamente' });
                     } else {
