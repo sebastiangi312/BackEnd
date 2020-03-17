@@ -68,7 +68,7 @@ exports.setSportWinners = async (req, res) => {
         spTickets.forEach(async (spTicket) => {
             //se verifica si el tiquete no se hayan evaluado y que ya esté cerrado
             if (typeof spTicket.isWinner === "undefined" && today >= spTicket.closingDate) {
-                let areCorrect = 0;
+                var areCorrect = 0;
 
                 //se cuentan los aciertos en el tiquete
                 spTicket.matchBets.forEach(async (bet) => {
@@ -81,7 +81,7 @@ exports.setSportWinners = async (req, res) => {
                 });
 
                 //userProfit es el porcentaje de la ganancia
-                let userProfit = 0;
+                var userProfit = 0;
                 if (areCorrect >= 5) {
                     //determina cuánto es el porcentaje de la ganancia
                     if (areCorrect === 5) {
