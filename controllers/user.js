@@ -120,7 +120,7 @@ exports.editUser = async (req, res) => {
 exports.authorizeUser = async (req, res) => {
     try {
         //Usuario que se va a autorizar
-        const { idUserToAuthoriz, newBalance } = req.body;
+        const { idUserToAuthorize, newBalance } = req.body;
 
         const result = await User.updateOne({ _id: idUserToAuthorize }, { $set: { roles: { bettor: true }, balance: newBalance } });
 
