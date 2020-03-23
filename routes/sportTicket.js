@@ -6,5 +6,5 @@ const router = express.Router();
 
 router.post("", checkAuth, SportTicketController.createSportTicket );
 router.put("/setSportWinners", checkAuth, SportTicketController.setSportWinners );
-
+router.get("/showSportTickets", SportTicketController.showSportTickets );
 module.exports = router;
