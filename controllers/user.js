@@ -84,8 +84,7 @@ exports.getCurrentUser = async (req, res) => {
             balance =  gb;
         }else{
             balance = user.balance;
-        }  
-        console.log("balance",balance)
+        } 
         const profileData = { id, name, email, birthdate, phone, balance, roles };
         res.status(200).json(profileData);
     } catch (err) {

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
+const GlobalBalance = require("../models/globalBalance");
 
 
 exports.createTransaction = async (req, res) => {
@@ -103,6 +104,7 @@ exports.chargeMoney = async (req, res) => {
         const newBalance = amount + user.balance;
         const result = await User.updateOne({ _id: userId }, { balance: newBalance });
         const transactionUpdate = await Transaction.updateOne({ _id: chargeId }, { approved: true });
+        const updateAdminGB = await GlobalBalance.updateOne({}, { $inc: { value: amount } });
         // Se demora mucho porque hay muchos awaits.
         if (result.n > 0) {
             res.status(200).json({ message: "Recarga realizada correctamente" });
