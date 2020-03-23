@@ -5,6 +5,7 @@ const Ticket = require("../models/ticket");
 const SportTicket = require("../models/sportTicket");
 const Match = require("../models/match");
 const Lottery = require("../models/lottery");
+const GlobalBalance = require("../models/globalBalance");
 
 exports.createUser = async (req, res) => {
 
@@ -65,6 +66,8 @@ exports.userLogin = async (req, res) => {
 exports.getCurrentUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
+        const globalBalance = await GlobalBalance.find();
+        const gb = globalBalance[0].value;
         if (!user) {
             return res.status(401).json({
                 message: "4. Credenciales de autenticación inválidas"
@@ -76,8 +79,12 @@ exports.getCurrentUser = async (req, res) => {
         const email = user.email;
         const birthdate = user.birthdate;
         const phone = user.phone;
-        const balance = user.balance;
         const roles = user.roles;
+        if(roles.admin == true){
+            balance =  gb;
+        }else{
+            balance = user.balance;
+        } 
         const profileData = { id, name, email, birthdate, phone, balance, roles };
         res.status(200).json(profileData);
     } catch (err) {
