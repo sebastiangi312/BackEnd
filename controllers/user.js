@@ -23,11 +23,12 @@ exports.createUser = async (req, res) => {
                    result: result
             });
             }
+        }else{
+             res.status(401).json({
+                message: "El usuario ya existe en la base de datos",
+                result: result
+            });
         }
-        res.status(401).json({
-            message: "El usuario ya existe en la base de datos",
-            result: result
-        });
     } catch (err) {
         return res.status(500).json({
             message: "Error Interno del Servidor"
