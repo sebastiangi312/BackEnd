@@ -4,6 +4,7 @@ const Lottery = require("../models/lottery");
 const GlobalBalance = require("../models/globalBalance");
 
 exports.createLotteryTicket = async (req, res) => {
+    console.log('createLottery');
     try {
         const { lotteryId, userId, firstNumber, secondNumber, thirdNumber, fourthNumber, fifthNumber } = req.body;
 
@@ -21,7 +22,8 @@ exports.createLotteryTicket = async (req, res) => {
                 // Ajusta el balance del usuario
                 const newUserBalance = user.balance - lottery.fare;
                 const result1 = await User.updateOne({ _id: userId }, { balance: newUserBalance });
-                if (result1 <= 0) {
+                console.log('result1', result1.n);
+                if (result1.n <= 0) {
                     return res.status(401).json({
                         message: "Ocurrió un error al restar el valor del saldo del usuario"
                     });
@@ -30,7 +32,7 @@ exports.createLotteryTicket = async (req, res) => {
                 const globalBalance = await GlobalBalance.find();
                 const newValue = globalBalance[0].value + lottery.fare;
                 const result2 = await GlobalBalance.updateOne({ _id: globalBalance[0]._id }, { value: newValue });
-                if (result2 <= 0) {
+                if (result2.n <= 0) {
                     return res.status(401).json({
                         message: "Ocurrió un error al ajustar el balance global"
                     });

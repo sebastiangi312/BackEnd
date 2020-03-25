@@ -80,11 +80,11 @@ exports.getCurrentUser = async (req, res) => {
         const birthdate = user.birthdate;
         const phone = user.phone;
         const roles = user.roles;
-        if(roles.admin == true){
-            balance =  gb;
-        }else{
+        if (roles.admin == true) {
+            balance = gb;
+        } else {
             balance = user.balance;
-        } 
+        }
         const profileData = { id, name, email, birthdate, phone, balance, roles };
         res.status(200).json(profileData);
     } catch (err) {
@@ -96,10 +96,11 @@ exports.getCurrentUser = async (req, res) => {
 
 exports.editUser = async (req, res) => {
     try {
-        const { _id, email, phone, password, newPassword } = req.body;
-        const user = await User.findById(req.userData.userId);
-        if (newPassword === '') {
-            const result = await User.updateOne({ _id: req.userData.userId }, { phone: phone });
+        const userId = req.userData.userId;
+        const { phone, password, newPassword } = req.body;
+        const user = await User.findById(userId);
+        if (newPassword === null || newPassword.trim() === '') {
+            const result = await User.updateOne({ _id: userId }, { phone: phone });
             if (result.n > 0) {
                 res.status(200).json({ message: "Update successful!" });
             } else {
@@ -109,7 +110,7 @@ exports.editUser = async (req, res) => {
             const validPassword = await bcrypt.compare(password, user.password);
             if (validPassword) {
                 const hashedPassword = await bcrypt.hash(newPassword, 10);
-                const result = await User.updateOne({ _id: req.params.userId }, { phone: phone, password: hashedPassword });
+                const result = await User.updateOne({ _id: userId }, { phone: phone, password: hashedPassword });
                 if (result.n > 0) {
                     res.status(200).json({ message: "Update successful!" });
                 } else {
@@ -119,7 +120,7 @@ exports.editUser = async (req, res) => {
         }
     } catch (err) {
         res.status(500).json({
-            message: "Couldn't udpate post!"
+            message: "Couldn't udpate user!"
         });
     }
 };
