@@ -13,22 +13,16 @@ exports.createUser = async (req, res) => {
         const { id, name, email, password, birthdate, phone, balance, authorized, roles } = req.body;
         const hash = await bcrypt.hash(password, 10);
         const cedulaExiste = await User.findOne({ email: req.body.id });
-        if (!cedulaExiste) {
-            const user = new User({ id, name, email, password: hash, birthdate, phone, balance: 0, authorized: true, roles: { subscriber: true } });
-            const result = await user.save();
-            res.status(201).json({
-                message: "Usuario creado satisfactoriamente",
-                result: result
-            });
-        }
         const emailExiste = await User.findOne({ email: req.body.email });
-        if (!emailExiste) {
-            const user = new User({ id, name, email, password: hash, birthdate, phone, balance: 0, authorized: true, roles: { subscriber: true } });
-            const result = await user.save();
-            res.status(201).json({
-                message: "Usuario creado satisfactoriamente",
-                result: result
+        if (!cedulaExiste) {
+            if (!emailExiste) {
+                const user = new User({ id, name, email, password: hash, birthdate, phone, balance: 0, authorized: true, roles: { subscriber: true } });
+                const result = await user.save();
+                res.status(201).json({
+                   message: "Usuario creado satisfactoriamente",
+                   result: result
             });
+            }
         }
         res.status(401).json({
             message: "El usuario ya existe en la base de datos",
