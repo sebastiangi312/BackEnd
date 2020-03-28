@@ -62,12 +62,19 @@ exports.createSportTicket = async (req, res) => {
 //Se establecen los ganadores
 exports.setSportWinners = async (req, res) => {
     try {
-        const today = new Date(2022,12,25);
+        const today = new Date();
         const spTickets = await SportTicket.find();
 
         spTickets.forEach(async (spTicket) => {
             //se verifica si el tiquete no se hayan evaluado y que ya esté cerrado
-            if (typeof spTicket.isWinner === "undefined" && today >= spTicket.closingDate) {
+            
+            // Saca ids de partidos
+            const ids = spTicket.matchBets.map(matchBets => matchBets.match);
+            // Saca los partidos con esas ids.
+            const matches = await Match.find().where('_id').in(ids).exec();
+            // Condicional
+            
+            if (typeof spTicket.isWinner === "undefined" && !matches.some(match => typeof match.finalScoreBoard === 'undefined')) {
                 var areCorrect = 0;
                 //se cuentan los aciertos en el tiquete
                 var cont = 0;
